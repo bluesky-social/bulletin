@@ -296,10 +296,14 @@ export class SyncEngine {
       );
       if (
         response.uri !== watch.spaceUri ||
-        response.policy.$type !==
+        response.readPolicy.$type !==
           "com.atproto.simplespace.defs#managingAppPolicy" ||
-        !("managingApp" in response.policy) ||
-        response.policy.managingApp !== this.managingAppService
+        !("managingApp" in response.readPolicy) ||
+        response.readPolicy.managingApp !== this.managingAppService ||
+        response.writePolicy.$type !==
+          "com.atproto.simplespace.defs#managingAppPolicy" ||
+        !("managingApp" in response.writePolicy) ||
+        response.writePolicy.managingApp !== this.managingAppService
       ) {
         throw new InvalidBulletinSpaceError();
       }

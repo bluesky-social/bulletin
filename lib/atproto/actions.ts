@@ -34,7 +34,11 @@ export async function createBoard(session: OAuthSession): Promise<string> {
   const result = await client.call(com.atproto.simplespace.createSpace, {
     type: SPACE_TYPE,
     skey: "self",
-    policy: {
+    readPolicy: {
+      $type: "com.atproto.simplespace.defs#managingAppPolicy",
+      managingApp: getConfig().managingAppService,
+    },
+    writePolicy: {
       $type: "com.atproto.simplespace.defs#managingAppPolicy",
       managingApp: getConfig().managingAppService,
     },
