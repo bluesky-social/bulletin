@@ -39,6 +39,7 @@ export type StoredPost = Omit<
 export type SpaceWatch = {
   spaceUri: string;
   authorityDid: string;
+  spaceRev: string | null;
   registrationExpiresAt: string | null;
   lastError: string | null;
 };
@@ -172,6 +173,7 @@ export async function saveSpaceWatch(input: {
     .values({
       ...input,
       registrationExpiresAt: null,
+      spaceRev: null,
       lastError: null,
       updatedAt: new Date().toISOString(),
     })
@@ -190,6 +192,7 @@ export async function listSpaceWatches(): Promise<SpaceWatch[]> {
     .select([
       "spaceUri",
       "authorityDid",
+      "spaceRev",
       "registrationExpiresAt",
       "lastError",
     ])
@@ -240,12 +243,24 @@ export async function deleteSyncedSpace(spaceUri: string): Promise<void> {
 
 export async function updateSpaceWatch(input: {
   spaceUri: string;
+  spaceRev?: string;
   registrationExpiresAt?: string | null;
   lastError?: string | null;
 }): Promise<void> {
   await getQueryDb()
     .updateTable("syncSpace")
     .set((eb) => ({
+      ...(input.spaceRev
+        ? {
+            spaceRev: eb.case()
+              .when("syncSpace.spaceRev", "is", null)
+              .then(input.spaceRev)
+              .when("syncSpace.spaceRev", "<", input.spaceRev)
+              .then(input.spaceRev)
+              .else(eb.ref("syncSpace.spaceRev"))
+              .end(),
+          }
+        : {}),
       registrationExpiresAt: eb.fn.coalesce(
         eb.val(input.registrationExpiresAt ?? null),
         "syncSpace.registrationExpiresAt",

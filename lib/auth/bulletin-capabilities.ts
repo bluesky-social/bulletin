@@ -1,5 +1,6 @@
 import type { OAuthSession } from "@atproto/oauth-client-node";
 import { ScopePermissions } from "@atproto/oauth-scopes";
+import { asStringFormat } from "@atproto/lex-schema";
 import {
   BOARD_SKEY,
   POST_COLLECTION,
@@ -30,13 +31,13 @@ export function bulletinCapabilitiesFromScope(
       viewerDid === ownerDid &&
       permissions.allowsSpace({
         type: SPACE_TYPE,
-        authority: viewerDid,
+        authority: asStringFormat(viewerDid, "did"),
         skey: BOARD_SKEY,
         manage: "create",
       }),
     canCreateNote: permissions.allowsSpace({
       type: SPACE_TYPE,
-      authority: ownerDid,
+      authority: asStringFormat(ownerDid, "did"),
       skey: BOARD_SKEY,
       collection: POST_COLLECTION,
       action: "create",

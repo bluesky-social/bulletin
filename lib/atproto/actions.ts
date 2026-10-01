@@ -32,7 +32,7 @@ import { com } from "../lexicons";
 export async function createBoard(session: OAuthSession): Promise<string> {
   const client = new Client(session);
   const result = await client.call(com.atproto.simplespace.createSpace, {
-    type: SPACE_TYPE,
+    spaceType: SPACE_TYPE,
     skey: "self",
     readPolicy: {
       $type: "com.atproto.simplespace.defs#managingAppPolicy",

@@ -1,41 +1,64 @@
 import { Client, XrpcResponseError } from "@atproto/lex-client";
 import { LexError } from "@atproto/lex-data";
 import { asStringFormat } from "@atproto/lex-schema";
-import { JoseKey } from "@atproto/jwk-jose";
+import { P256Keypair } from "@atproto/crypto";
 import type { OAuthSession } from "@atproto/oauth-client-node";
-import { createDpopProof } from "@atproto/space";
+import { createSpaceSigHeaders, parseSpaceToken } from "@atproto/space";
 import { com } from "../lexicons";
 import { resolvePds } from "./identity";
 
-const GET_SPACE_CREDENTIAL_PATH =
-  "/xrpc/com.atproto.space.getSpaceCredential";
+const GET_SPACE_CREDENTIAL_PATH = "/xrpc/com.atproto.space.getSpaceCredential";
 
 export class SpaceCredential {
+  private invalidated = false;
+
   constructor(
     readonly token: string,
-    readonly key: JoseKey,
+    readonly key: P256Keypair,
     private readonly fetchImpl: typeof fetch = fetch,
   ) {}
 
+  needsRefresh(now = Date.now()): boolean {
+    if (this.invalidated) return true;
+    const { exp } = parseSpaceToken("credential", this.token).payload;
+    return !Number.isFinite(exp) || now + 5_000 >= exp * 1000;
+  }
+
   fetch = async (
     input: string | URL | Request,
+    audience: string,
     init?: RequestInit,
   ): Promise<Response> => {
+    if (this.needsRefresh()) {
+      throw new LexError("JwtExpired", "Refresh the space credential");
+    }
     const request = new Request(input, { ...init, redirect: "error" });
-    request.headers.set("authorization", `DPoP ${this.token}`);
-    request.headers.set(
-      "dpop",
-      await createDpopProof(this.key, {
-        htm: request.method,
-        htu: request.url,
-        credential: this.token,
-      }),
-    );
-    return this.fetchImpl(request);
+    const headers = await createSpaceSigHeaders(this.key, {
+      authorization: `Atproto-Space ${this.token}`,
+      audience: asStringFormat(audience, "did"),
+    });
+    for (const [name, value] of Object.entries(headers)) {
+      request.headers.set(name, value);
+    }
+    const response = await this.fetchImpl(request);
+    if (!response.ok) {
+      const body = asObject(await readJson(response.clone()));
+      if (body?.error === "CredentialRevoked" || body?.error === "JwtExpired") {
+        this.invalidated = true;
+        throw new LexError(
+          body.error,
+          typeof body.message === "string" ? body.message : undefined,
+        );
+      }
+    }
+    return response;
   };
 
-  client(service: string): Client {
-    return new Client({ service, fetch: this.fetch });
+  client(service: string, audience: string): Client {
+    return new Client({
+      service,
+      fetch: (input, init) => this.fetch(input, audience, init),
+    });
   }
 }
 
@@ -51,7 +74,7 @@ export async function mintSpaceCredential(
   const authority = space.match(/^at:\/\/(did:[^/]+)\/space\//)?.[1];
   if (!authority) throw new Error("Invalid space URI");
   const authorityPds = await resolvePds(authority);
-  const key = await JoseKey.generate(["ES256"]);
+  const key = await P256Keypair.create();
   const credential = await exchangeSpaceCredential({
     authorityPds,
     delegationToken: delegation.token,
@@ -65,7 +88,7 @@ export async function exchangeSpaceCredential(input: {
   authorityPds: string;
   delegationToken: string;
   space: string;
-  key: JoseKey;
+  key: P256Keypair;
   fetchImpl?: typeof fetch;
 }): Promise<string> {
   const url = new URL(GET_SPACE_CREDENTIAL_PATH, input.authorityPds);
@@ -74,19 +97,13 @@ export async function exchangeSpaceCredential(input: {
     redirect: "error",
     headers: {
       accept: "application/json",
-      authorization: `Bearer ${input.delegationToken}`,
+      ...(await createSpaceSigHeaders(input.key, {
+        authorization: `Bearer ${input.delegationToken}`,
+      })),
       "content-type": "application/json",
     },
     body: JSON.stringify({ space: input.space }),
   });
-  request.headers.set(
-    "dpop",
-    await createDpopProof(input.key, {
-      htm: request.method,
-      htu: request.url,
-    }),
-  );
-
   const response = await (input.fetchImpl ?? fetch)(request);
   const body = await readJson(response);
   if (!response.ok) {

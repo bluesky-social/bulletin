@@ -1,6 +1,8 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { fromBase64 } from "@atproto/lex-data";
 import { SyncEngine } from "./engine";
 import { isBoardAbsentError } from "./errors";
+import { com } from "../lexicons";
 import {
   verifySpaceDeletionNotification,
   verifySyncNotification,
@@ -132,20 +134,17 @@ export class SyncService {
         url.pathname === "/xrpc/com.atproto.space.notifyWrite"
       ) {
         const body = await readJson(request);
-        if (
-          typeof body.space !== "string" ||
-          typeof body.repo !== "string" ||
-          typeof body.rev !== "string"
-        ) {
+        const notification = parseWriteNotification(body);
+        if (!notification) {
           return json(response, 400, { error: "Invalid notification" });
         }
         const authorization = Array.isArray(request.headers.authorization)
           ? request.headers.authorization[0]
           : request.headers.authorization;
-        await verifySyncNotification(authorization, body.space);
+        await verifySyncNotification(authorization, notification.space);
         json(response, 200, {});
         void this.#engine
-          .notify({ space: body.space, repo: body.repo, rev: body.rev })
+          .notify(notification)
           .catch((error) => console.error("notification sync failed", error));
         return;
       }
@@ -191,6 +190,21 @@ export class SyncService {
   #broadcast(space: string): void {
     const payload = `data: ${JSON.stringify({ space })}\n\n`;
     for (const client of this.#clients.get(space) ?? []) client.write(payload);
+  }
+}
+
+export function parseWriteNotification(body: Record<string, unknown>) {
+  try {
+    const hash = body.hash as { $bytes?: unknown } | undefined;
+    if (!hash || typeof hash.$bytes !== "string") return undefined;
+    const parsed = com.atproto.space.notifyWrite.$input.schema.safeParse({
+      ...body,
+      hash: fromBase64(hash.$bytes),
+    });
+    if (!parsed.success || !parsed.value.spaceRev) return undefined;
+    return { ...parsed.value, spaceRev: parsed.value.spaceRev };
+  } catch {
+    return undefined;
   }
 }
 

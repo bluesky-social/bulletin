@@ -11,6 +11,13 @@ export function isSpaceDeletedError(error: unknown): boolean {
   return error instanceof LexError && error.error === "SpaceDeleted";
 }
 
+export function isCredentialRejectedError(error: unknown): boolean {
+  return (
+    error instanceof LexError &&
+    (error.error === "CredentialRevoked" || error.error === "JwtExpired")
+  );
+}
+
 export function isSpaceNotFoundError(error: unknown): boolean {
   return error instanceof LexError && error.error === "SpaceNotFound";
 }

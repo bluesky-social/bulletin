@@ -11,6 +11,7 @@ const lexicons = [
   "com.atproto.space.deleteRecord",
   "com.atproto.space.registerNotify",
   "com.atproto.space.listRepos",
+  "com.atproto.space.notifyWrite",
   "com.atproto.space.listRepoOps",
   "com.atproto.space.getBlob",
   "com.atproto.repo.uploadBlob",

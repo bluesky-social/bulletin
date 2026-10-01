@@ -61,6 +61,7 @@ export type DatabaseSchema = {
   syncSpace: {
     spaceUri: string;
     authorityDid: string;
+    spaceRev: string | null;
     registrationExpiresAt: string | null;
     lastError: string | null;
     updatedAt: string;

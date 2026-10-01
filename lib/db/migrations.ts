@@ -8,6 +8,7 @@ import { getQueryDb } from "./index";
 import type { DatabaseSchema } from "./schema";
 
 export const INITIAL_MIGRATION_NAME = "001_initial";
+export const SPACE_REV_MIGRATION_NAME = "002_space_revision";
 
 const APPLICATION_TABLES = [
   "account",
@@ -50,7 +51,25 @@ const initialMigration: Migration = {
 
 const migrationProvider: MigrationProvider = {
   async getMigrations() {
-    return { [INITIAL_MIGRATION_NAME]: initialMigration };
+    return {
+      [INITIAL_MIGRATION_NAME]: initialMigration,
+      [SPACE_REV_MIGRATION_NAME]: {
+        async up(db) {
+          // Existing installations bootstrap a space checkpoint on their next sync.
+          // syncRepo.rev remains the repo commit revision, not a listing cursor.
+          await db.schema
+            .alterTable("syncSpace")
+            .addColumn("spaceRev", "text")
+            .execute();
+        },
+        async down(db) {
+          await db.schema
+            .alterTable("syncSpace")
+            .dropColumn("spaceRev")
+            .execute();
+        },
+      },
+    };
   },
 };
 
