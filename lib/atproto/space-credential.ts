@@ -3,11 +3,26 @@ import { LexError } from "@atproto/lex-data";
 import { asStringFormat } from "@atproto/lex-schema";
 import { P256Keypair } from "@atproto/crypto";
 import type { OAuthSession } from "@atproto/oauth-client-node";
-import { createSpaceSigHeaders, parseSpaceToken } from "@atproto/space";
+import {
+  COMMIT_MAC_TYPE,
+  MAC_HEADER,
+  WANT_MAC_HEADER,
+  createSpaceSigHeaders,
+  encapsulate,
+  formatWantMacHeader,
+  parseMacHeader,
+  parseSpaceToken,
+} from "@atproto/space";
 import { com } from "../lexicons";
-import { resolvePds } from "./identity";
+import { resolveKemKey, resolvePds } from "./identity";
 
 const GET_SPACE_CREDENTIAL_PATH = "/xrpc/com.atproto.space.getSpaceCredential";
+
+export type CommitMacRequest = {
+  headers: Record<string, string>;
+  /** The shared secret and the MAC the response carried, for `verifyCommit`. */
+  params: (headers: Headers) => { sharedSecret: Uint8Array; mac: Uint8Array };
+};
 
 export class SpaceCredential {
   private invalidated = false;
@@ -34,7 +49,7 @@ export class SpaceCredential {
     }
     const request = new Request(input, { ...init, redirect: "error" });
     const headers = await createSpaceSigHeaders(this.key, {
-      authorization: `Atproto-Space ${this.token}`,
+      authorization: `Atproto-Space-Credential ${this.token}`,
       audience: asStringFormat(audience, "did"),
     });
     for (const [name, value] of Object.entries(headers)) {
@@ -59,6 +74,28 @@ export class SpaceCredential {
       service,
       fetch: (input, init) => this.fetch(input, audience, init),
     });
+  }
+
+  /**
+   * Ask a repo host to MAC the commit in its response. Each request needs its own
+   * key share against the author's `#atproto_kem` key, including every page.
+   */
+  async requestCommitMac(
+    repo: string,
+    refreshKey = false,
+  ): Promise<CommitMacRequest> {
+    const { keyShare, sharedSecret } = await encapsulate(
+      await resolveKemKey(repo, refreshKey),
+    );
+    return {
+      headers: {
+        [WANT_MAC_HEADER]: formatWantMacHeader(COMMIT_MAC_TYPE, keyShare),
+      },
+      params: (headers) => ({
+        sharedSecret,
+        mac: parseMacHeader(headers.get(MAC_HEADER) ?? undefined, COMMIT_MAC_TYPE),
+      }),
+    };
   }
 }
 
@@ -97,12 +134,13 @@ export async function exchangeSpaceCredential(input: {
     redirect: "error",
     headers: {
       accept: "application/json",
-      ...(await createSpaceSigHeaders(input.key, {
-        authorization: `Bearer ${input.delegationToken}`,
-      })),
       "content-type": "application/json",
     },
-    body: JSON.stringify({ space: input.space }),
+    body: JSON.stringify({
+      space: input.space,
+      credentialKid: input.key.did(),
+      delegationToken: input.delegationToken,
+    }),
   });
   const response = await (input.fetchImpl ?? fetch)(request);
   const body = await readJson(response);

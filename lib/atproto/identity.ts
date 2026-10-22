@@ -1,5 +1,5 @@
-import { getPdsEndpoint } from "@atproto/common-web";
-import { IdResolver } from "@atproto/identity";
+import { getPdsEndpoint, getVerificationMaterial } from "@atproto/common-web";
+import { getDidKeyFromMultibase, IdResolver } from "@atproto/identity";
 import { getConfig } from "../config";
 import { getAccount, saveAccount } from "../db/queries";
 
@@ -27,6 +27,18 @@ export async function resolvePds(did: string): Promise<string> {
     ?.slice("at://".length);
   await saveAccount({ did, handle, pdsUrl });
   return pdsUrl;
+}
+
+/** The account's `#atproto_kem` key, which repo MACs are keyed against. */
+export async function resolveKemKey(
+  did: string,
+  forceRefresh = false,
+): Promise<string> {
+  const doc = await resolveDid(did, forceRefresh);
+  const key = getVerificationMaterial(doc, "atproto_kem");
+  const didKey = key && getDidKeyFromMultibase(key);
+  if (!didKey) throw new Error(`${did} has no #atproto_kem key`);
+  return didKey;
 }
 
 export async function resolveIdentifier(identifier: string): Promise<string> {

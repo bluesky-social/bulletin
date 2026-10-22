@@ -4,8 +4,21 @@ import { XrpcResponseError } from "@atproto/lex-client";
 import { LexError } from "@atproto/lex-data";
 import { P256Keypair } from "@atproto/crypto";
 import { asStringFormat } from "@atproto/lex-schema";
-import { verifySpaceSignature } from "@atproto/space";
+import {
+  COMMIT_MAC_TYPE,
+  MAC_HEADER,
+  RepoCommit,
+  SpaceMacError,
+  WANT_MAC_HEADER,
+  computeCommitMac,
+  decapsulate,
+  formatMacHeader,
+  parseWantMacHeader,
+  verifyCommit,
+  verifyCredentialSig,
+} from "@atproto/space";
 import { com } from "../lexicons";
+import { getIdResolver } from "./identity";
 import { exchangeSpaceCredential, SpaceCredential } from "./space-credential";
 
 const AUTHORITY_PDS = "https://authority.example";
@@ -13,7 +26,7 @@ const EXCHANGE_URL = `${AUTHORITY_PDS}/xrpc/com.atproto.space.getSpaceCredential
 const SPACE = "at://did:plc:owner/space/my.bulletin.board/self";
 const DELEGATION_TOKEN = "delegation-token";
 
-test("credential exchange signs only the delegation Authorization with its P-256 key", async () => {
+test("credential requests carry the delegation token and binding key in an unsigned body", async () => {
   const key = await P256Keypair.create();
   let requestSeen = false;
 
@@ -28,22 +41,17 @@ test("credential exchange signs only the delegation Authorization with its P-256
       assert.equal(request.method, "POST");
       assert.equal(request.url, EXCHANGE_URL);
       assert.equal(request.redirect, "error");
-      assert.equal(
-        request.headers.get("authorization"),
-        `Bearer ${DELEGATION_TOKEN}`,
-      );
-      assert.deepEqual(await request.json(), { space: SPACE });
+      assert.deepEqual(await request.json(), {
+        space: SPACE,
+        credentialKid: key.did(),
+        delegationToken: DELEGATION_TOKEN,
+      });
 
+      assert.equal(request.headers.get("authorization"), null);
       assert.equal(request.headers.get("dpop"), null);
       assert.equal(request.headers.get("atproto-space-audience"), null);
-      assert.equal(
-        request.headers.get("signature-input"),
-        `atproto-space=("authorization");keyid="${key.did()}"`,
-      );
-      assert.equal(
-        await verifySpaceSignature(Object.fromEntries(request.headers)),
-        key.did(),
-      );
+      assert.equal(request.headers.get("signature-input"), null);
+      assert.equal(request.headers.get("signature"), null);
 
       return Response.json({ credential: "space-credential" });
     },
@@ -92,19 +100,19 @@ test("credential reads sign each repo audience, including accounts sharing a PDS
     assert.equal(request.redirect, "error");
     assert.equal(
       request.headers.get("authorization"),
-      `Atproto-Space ${token}`,
+      `Atproto-Space-Credential ${token}`,
     );
     assert.equal(request.headers.get("atproto-space-audience"), audience);
     assert.equal(request.headers.get("dpop"), null);
     assert.equal(
       request.headers.get("signature-input"),
-      'atproto-space=("authorization" "atproto-space-audience")',
+      'atproto-space-credential=("authorization" "atproto-space-audience");tag="atproto-space-credential"',
     );
     const headers = Object.fromEntries(request.headers);
     const keyId = asStringFormat(key.did(), "did");
-    assert.equal(await verifySpaceSignature(headers, keyId), key.did());
+    await verifyCredentialSig(headers, keyId);
     await assert.rejects(
-      verifySpaceSignature(
+      verifyCredentialSig(
         { ...headers, "atproto-space-audience": "did:plc:wrong" },
         keyId,
       ),
@@ -133,6 +141,64 @@ test("credential reads sign each repo audience, including accounts sharing a PDS
     "did:plc:other",
     "did:plc:owner",
   ]);
+});
+
+test("commit MAC requests use a fresh key share against the author's KEM key", async (t) => {
+  const kem = await P256Keypair.create();
+  const didResolver = getIdResolver().did;
+  const originalResolve = didResolver.resolve;
+  t.after(() => {
+    didResolver.resolve = originalResolve;
+  });
+  const refreshes: boolean[] = [];
+  didResolver.resolve = async (did, forceRefresh) => {
+    refreshes.push(forceRefresh === true);
+    return {
+      id: did,
+      verificationMethod: [
+        {
+          id: `${did}#atproto_kem`,
+          type: "Multikey",
+          controller: did,
+          publicKeyMultibase: kem.did().slice("did:key:".length),
+        },
+      ],
+    };
+  };
+
+  const key = await P256Keypair.create();
+  const credential = new SpaceCredential(credentialToken(key), key);
+  const repo = asStringFormat("did:plc:writer", "did");
+  const space = asStringFormat(SPACE, "space-ref");
+  const first = await credential.requestCommitMac(repo);
+  const retry = await credential.requestCommitMac(repo, true);
+  assert.deepEqual(refreshes, [false, true]);
+  const keyShare = parseWantMacHeader(
+    first.headers[WANT_MAC_HEADER],
+    COMMIT_MAC_TYPE,
+  );
+  assert.notEqual(
+    keyShare,
+    parseWantMacHeader(retry.headers[WANT_MAC_HEADER], COMMIT_MAC_TYPE),
+  );
+
+  // Repo host side: MAC the commit with the secret from the first key share.
+  const commit = new RepoCommit().toCommit({ space, repo, rev: "3m22222222222" });
+  const mac = computeCommitMac(decapsulate(kem, keyShare), commit);
+  const response = new Headers({
+    [MAC_HEADER]: formatMacHeader(COMMIT_MAC_TYPE, mac),
+  });
+  assert.equal(verifyCommit(commit, { space, repo, ...first.params(response) }), true);
+  assert.equal(verifyCommit(commit, { space, repo, ...retry.params(response) }), false);
+  assert.equal(
+    verifyCommit(commit, {
+      space,
+      repo: asStringFormat("did:plc:other", "did"),
+      ...first.params(response),
+    }),
+    false,
+  );
+  assert.throws(() => first.params(new Headers()), SpaceMacError);
 });
 
 test("refresh follows the credential's actual expiry, with a five-second lead", async () => {
@@ -173,7 +239,11 @@ function credentialToken(
   exp = Math.floor(Date.now() / 1000) + 600,
 ): string {
   // Client expiry hints only; the receiving service verifies the JWT.
-  const header = { typ: "atproto-space-credential+jwt", alg: "ES256" };
+  const header = {
+    typ: "atproto-space-credential+jwt",
+    alg: "ES256",
+    kid: "#atproto",
+  };
   const payload = {
     iss: "did:plc:owner",
     sub: SPACE,

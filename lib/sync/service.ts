@@ -195,11 +195,11 @@ export class SyncService {
 
 export function parseWriteNotification(body: Record<string, unknown>) {
   try {
-    const hash = body.hash as { $bytes?: unknown } | undefined;
-    if (!hash || typeof hash.$bytes !== "string") return undefined;
+    const data = body.data as { $bytes?: unknown } | undefined;
+    if (!data || typeof data.$bytes !== "string") return undefined;
     const parsed = com.atproto.space.notifyWrite.$input.schema.safeParse({
       ...body,
-      hash: fromBase64(hash.$bytes),
+      data: fromBase64(data.$bytes),
     });
     if (!parsed.success || !parsed.value.spaceRev) return undefined;
     return { ...parsed.value, spaceRev: parsed.value.spaceRev };

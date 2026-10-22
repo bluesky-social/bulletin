@@ -25,7 +25,7 @@ const entry = (n: number, did = writer) => ({
   did: asStringFormat(did, "did"),
   repoRev: rev(n),
   spaceRev: rev(n),
-  hash: new Uint8Array([n]),
+  data: new Uint8Array([n]),
 });
 type Page = { repos: ReturnType<typeof entry>[]; cursor?: string };
 
@@ -188,8 +188,9 @@ test("repo recovery does not retry a revoked credential", async (t) => {
     commitHash: new Uint8Array([2]),
   });
   const credential = {
+    requestCommitMac: async () => ({ headers: {}, params: () => undefined }),
     client: () => ({
-      call: async () => {
+      xrpc: async () => {
         throw new LexError("CredentialRevoked");
       },
     }),
@@ -216,9 +217,9 @@ test("forwarded notifications require the new revision fields and decode Lexicon
     repo: writer,
     repoRev: rev(3),
     spaceRev: rev(4),
-    hash: { $bytes: "AQI=" },
+    data: { $bytes: "AQI=" },
   };
-  assert.deepEqual(parseWriteNotification(body)?.hash, new Uint8Array([1, 2]));
+  assert.deepEqual(parseWriteNotification(body)?.data, new Uint8Array([1, 2]));
   assert.equal(
     parseWriteNotification({ ...body, spaceRev: undefined }),
     undefined,
