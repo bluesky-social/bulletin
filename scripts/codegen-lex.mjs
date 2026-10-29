@@ -2,8 +2,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const lexicons = [
-  "com.atproto.simplespace.createSpace",
-  "com.atproto.simplespace.getSpace",
+  "com.atproto.space.createSpace",
   "com.atproto.space.getDelegationToken",
   "com.atproto.space.getSpaceCredential",
   "com.atproto.space.createRecord",

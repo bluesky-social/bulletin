@@ -325,26 +325,8 @@ export class SyncEngine {
     if (watch.spaceUri !== boardUri(watch.authorityDid)) {
       throw new InvalidBulletinSpaceError();
     }
-    await this.withCredential(watch, async (credential) => {
-      const authorityPds = await resolvePds(watch.authorityDid);
-      const response = await credential.client(authorityPds, watch.authorityDid).call(
-        com.atproto.simplespace.getSpace,
-        { space: asStringFormat(watch.spaceUri, "space-ref") },
-      );
-      if (
-        response.uri !== watch.spaceUri ||
-        response.readPolicy.$type !==
-          "com.atproto.simplespace.defs#managingAppPolicy" ||
-        !("managingApp" in response.readPolicy) ||
-        response.readPolicy.managingApp !== this.managingAppService ||
-        response.writePolicy.$type !==
-          "com.atproto.simplespace.defs#managingAppPolicy" ||
-        !("managingApp" in response.writePolicy) ||
-        response.writePolicy.managingApp !== this.managingAppService
-      ) {
-        throw new InvalidBulletinSpaceError();
-      }
-    });
+    // Minting a credential shows the board exists before it is watched.
+    await this.withCredential(watch, async () => undefined);
   }
 
   private async removeWatch(watch: SpaceWatch): Promise<void> {

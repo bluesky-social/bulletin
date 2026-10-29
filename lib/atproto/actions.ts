@@ -31,20 +31,12 @@ import { com } from "../lexicons";
 
 export async function createBoard(session: OAuthSession): Promise<string> {
   const client = new Client(session);
-  const result = await client.call(com.atproto.simplespace.createSpace, {
+  const result = await client.call(com.atproto.space.createSpace, {
     spaceType: SPACE_TYPE,
     skey: "self",
-    readPolicy: {
-      $type: "com.atproto.simplespace.defs#managingAppPolicy",
+    policy: com.atproto.managedspace.policy.$build({
       managingApp: getConfig().managingAppService,
-    },
-    writePolicy: {
-      $type: "com.atproto.simplespace.defs#managingAppPolicy",
-      managingApp: getConfig().managingAppService,
-    },
-    appAccess: {
-      $type: "com.atproto.simplespace.defs#open",
-    },
+    }),
   });
   await saveBoard(result.uri, session.did);
   return result.uri;

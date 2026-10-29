@@ -85,7 +85,11 @@ export default async function BoardPage({
       const restrictedHandle = restrictedProfile?.handle ?? owner?.handle;
       let restrictedBoardExists: boolean | undefined;
       try {
-        restrictedBoardExists = await probeSpaceExists(session, space);
+        // The authority answers SpaceNotFound to readers it refuses, so a
+        // non-follower's probe can't tell a missing board from a restricted one.
+        restrictedBoardExists =
+          (await hasBoard(ownerDid)) ||
+          (await probeSpaceExists(session, space));
       } catch (error) {
         console.error("Could not check whether board exists", error);
       }

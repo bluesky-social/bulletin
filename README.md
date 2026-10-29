@@ -2,7 +2,7 @@
 
 An example application built on atproto spaces (aka the [permissioned data protocol](https://github.com/bluesky-social/proposals/tree/main/0016-permissioned-data)).
 
-Every Bluesky user can create one bulletin board backed by a `com.atproto.simplespace` space under their DID. Only a user's followers can read their board, and only mutuals are able to post to it.
+Every Bluesky user can create one bulletin board backed by a `com.atproto.managedspace` space under their DID. Only a user's followers can read their board, and only mutuals are able to post to it.
 
 The owner of the board can move notes around and remove other users' notes as well.
 

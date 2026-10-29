@@ -2,7 +2,7 @@ import { verifyJwt } from "@atproto/xrpc-server";
 import { getConfig } from "../config";
 import { getIdResolver } from "./identity";
 
-const CHECK_ACCESS_LXM = "com.atproto.simplespace.checkUserAccess";
+const CHECK_ACCESS_LXM = "com.atproto.managedspace.checkUserAccess";
 
 export async function verifyManagingAppRequest(
   authorization: string | null,

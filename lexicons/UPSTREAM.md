@@ -7,8 +7,8 @@ except for these updated schemas:
 
 | Schemas | Source commit |
 | --- | --- |
-| `com.atproto.simplespace.createSpace` | [`d460767`](https://github.com/bluesky-social/atproto/commit/d460767643811e40ee4ec74102587232274d7ded) |
-| `com.atproto.space.defs`, `com.atproto.space.getSpaceCredential`, `com.atproto.space.listRepoOps`, `com.atproto.space.listRepos`, `com.atproto.space.notifyWrite` | [`ac0c9f1`](https://github.com/bluesky-social/atproto/commit/ac0c9f15392f6f0298d71dc52aa88c05036150be) |
+| `com.atproto.space.defs`, `com.atproto.space.listRepoOps`, `com.atproto.space.listRepos`, `com.atproto.space.notifyWrite` | [`ac0c9f1`](https://github.com/bluesky-social/atproto/commit/ac0c9f15392f6f0298d71dc52aa88c05036150be) |
+| `com.atproto.space.createSpace`, `com.atproto.space.getSpaceCredential`, `com.atproto.personalspace.policy`, `com.atproto.memberspace.policy`, `com.atproto.managedspace.policy` | [`5d88b41`](https://github.com/bluesky-social/atproto/commit/5d88b414a98de1ada22c94c78fa0667a7028163c) |
 
 Generate Bulletin's bindings with `pnpm codegen:lex` (also run by `pnpm build`).
 

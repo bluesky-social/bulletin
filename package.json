@@ -17,17 +17,17 @@
     "test": "node --import tsx --test lib/*.test.ts lib/**/*.test.ts"
   },
   "dependencies": {
-    "@atproto/common-web": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/crypto": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/identity": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/lex-client": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/lex-data": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/lex-schema": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/oauth-client-node": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/oauth-scopes": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/space": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/syntax": "0.0.0-spaces-alpha-20261022141228",
-    "@atproto/xrpc-server": "0.0.0-spaces-alpha-20261022141228",
+    "@atproto/common-web": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/crypto": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/identity": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/lex-client": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/lex-data": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/lex-schema": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/oauth-client-node": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/oauth-scopes": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/space": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/syntax": "0.0.0-spaces-alpha-20261029171913",
+    "@atproto/xrpc-server": "0.0.0-spaces-alpha-20261029171913",
     "better-sqlite3": "^12.5.0",
     "geist": "^1.7.2",
     "kysely": "^0.29.5",
@@ -37,7 +37,7 @@
     "tsx": "^4.21.0"
   },
   "devDependencies": {
-    "@atproto/lex": "0.0.0-spaces-alpha-20261022141228",
+    "@atproto/lex": "0.0.0-spaces-alpha-20261029171913",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
@@ -48,15 +48,15 @@
   },
   "pnpm": {
     "overrides": {
-      "@atproto/lex-builder": "0.0.0-spaces-alpha-20261022141228",
-      "@atproto/lex-client": "0.0.0-spaces-alpha-20261022141228",
-      "@atproto/lex-document": "0.0.0-spaces-alpha-20261022141228",
-      "@atproto/lex-installer": "0.0.0-spaces-alpha-20261022141228",
-      "@atproto/lex-resolver": "0.0.0-spaces-alpha-20261022141228",
-      "@atproto/lex-schema": "0.0.0-spaces-alpha-20261022141228",
-      "@atproto/lex-json@^0.0.0-spaces-alpha-20261022141228": "0.0.0-spaces-alpha-20261022141228",
-      "@atproto/lex-data@^0.0.0-spaces-alpha-20261022141228": "0.0.0-spaces-alpha-20261022141228",
-      "@atproto/lex-cbor@^0.0.0-spaces-alpha-20261022141228": "0.0.0-spaces-alpha-20261022141228"
+      "@atproto/lex-builder": "0.0.0-spaces-alpha-20261029171913",
+      "@atproto/lex-client": "0.0.0-spaces-alpha-20261029171913",
+      "@atproto/lex-document": "0.0.0-spaces-alpha-20261029171913",
+      "@atproto/lex-installer": "0.0.0-spaces-alpha-20261029171913",
+      "@atproto/lex-resolver": "0.0.0-spaces-alpha-20261029171913",
+      "@atproto/lex-schema": "0.0.0-spaces-alpha-20261029171913",
+      "@atproto/lex-json@^0.0.0-spaces-alpha-20261029171913": "0.0.0-spaces-alpha-20261029171913",
+      "@atproto/lex-data@^0.0.0-spaces-alpha-20261029171913": "0.0.0-spaces-alpha-20261029171913",
+      "@atproto/lex-cbor@^0.0.0-spaces-alpha-20261029171913": "0.0.0-spaces-alpha-20261029171913"
     }
   },
   "packageManager": "pnpm@8.15.9",
