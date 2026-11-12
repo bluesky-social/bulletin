@@ -1,4 +1,4 @@
-import type { Kysely } from "kysely";
+import { sql, type Kysely } from "kysely";
 import {
   Migrator,
   type Migration,
@@ -9,6 +9,7 @@ import type { DatabaseSchema } from "./schema";
 
 export const INITIAL_MIGRATION_NAME = "001_initial";
 export const SPACE_REV_MIGRATION_NAME = "002_space_revision";
+export const NOTIFY_TOKEN_MIGRATION_NAME = "003_notify_token";
 
 const APPLICATION_TABLES = [
   "account",
@@ -66,6 +67,26 @@ const migrationProvider: MigrationProvider = {
           await db.schema
             .alterTable("syncSpace")
             .dropColumn("spaceRev")
+            .execute();
+        },
+      },
+      [NOTIFY_TOKEN_MIGRATION_NAME]: {
+        async up(db) {
+          // Notifications are registered through authorizeSpaceSync with a token
+          // per space. Earlier registerNotify registrations are not carried over,
+          // so each watch registers again on its next authorization.
+          await db.schema
+            .alterTable("syncSpace")
+            .addColumn("notifyToken", "text")
+            .execute();
+          await sql`UPDATE sync_space
+            SET notify_token = lower(hex(randomblob(32))),
+              registration_expires_at = NULL`.execute(db);
+        },
+        async down(db) {
+          await db.schema
+            .alterTable("syncSpace")
+            .dropColumn("notifyToken")
             .execute();
         },
       },

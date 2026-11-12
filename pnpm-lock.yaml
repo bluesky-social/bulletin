@@ -5,51 +5,53 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@atproto/lex-builder': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/lex-client': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/lex-document': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/lex-installer': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/lex-resolver': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/lex-schema': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/lex-json@^0.0.0-spaces-alpha-20261105160032': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/lex-data@^0.0.0-spaces-alpha-20261105160032': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/lex-cbor@^0.0.0-spaces-alpha-20261105160032': 0.0.0-spaces-alpha-20261105160032
-  '@atproto/star@^0.0.0-spaces-alpha-20261105160032': 0.0.0-spaces-alpha-20261105160032
+  '@atproto/lex-builder': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-client': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-document': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-installer': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-resolver': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-json@^0.0.0-spaces-alpha-20261112204144': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-data@^0.0.0-spaces-alpha-20261112204144': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-cbor@^0.0.0-spaces-alpha-20261112204144': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/star@^0.0.0-spaces-alpha-20261112204144': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/lex-rpc@^0.0.0-spaces-alpha-20261112204144': 0.0.0-spaces-alpha-20261112204144
+  '@atproto/oauth-resolver@^0.0.0-spaces-alpha-20261112204144': 0.0.0-spaces-alpha-20261112204144
 
 dependencies:
   '@atproto/common-web':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/crypto':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/identity':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/lex-client':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/lex-data':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/lex-schema':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/oauth-client-node':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/oauth-scopes':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/space':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/syntax':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@atproto/xrpc-server':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   better-sqlite3:
     specifier: ^12.5.0
     version: 12.11.1
@@ -74,8 +76,8 @@ dependencies:
 
 devDependencies:
   '@atproto/lex':
-    specifier: 0.0.0-spaces-alpha-20261105160032
-    version: 0.0.0-spaces-alpha-20261105160032
+    specifier: 0.0.0-spaces-alpha-20261112204144
+    version: 0.0.0-spaces-alpha-20261112204144
   '@types/better-sqlite3':
     specifier: ^7.6.13
     version: 7.6.13
@@ -100,64 +102,61 @@ devDependencies:
 
 packages:
 
-  /@atproto-labs/did-resolver@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-pqiH1Niu/pyMQ0ja7n87VshYeVrzRlv0X2lM3u81CODoKAvU9bCnN9Jhhoh805dPzNonW2o2BeotsDcAM6U9dw==}
+  /@atproto-labs/did-resolver@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-j/bTiTl28Pk0L/4rj/IDeeHQdlJEiE9af/3X/WWudpzGSZuD6zJuWjYLS3OlzOKfDSdMoSHMEcUhVsVmb7XG2A==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto-labs/fetch': 0.3.5
-      '@atproto-labs/pipe': 0.2.4
+      '@atproto-labs/fetch': 0.4.2
+      '@atproto-labs/pipe': 0.2.5
       '@atproto-labs/simple-store': 0.5.1
       '@atproto-labs/simple-store-memory': 0.2.6
-      '@atproto/did': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/did': 0.0.0-spaces-alpha-20261112204144
       zod: 3.25.76
 
-  /@atproto-labs/fetch-node@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-Yjjo+eu0NNU+lFtPd2hekriSSPTdYVpx09rtSsTMWUpWh5wf4GmSpQgEeCG8mc66DKO59qL8xgSEpx/LJnyUqA==}
+  /@atproto-labs/fetch-node@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-dwLKw1JNXceuuSIybD14CNqf9DaPKVbIvwgsajnsVI+DwEJQcaWI+geTZEpUlXtyE0j5jyoaq6udu8M2utF35w==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto-labs/fetch': 0.3.5
-      '@atproto-labs/pipe': 0.2.4
+      '@atproto-labs/fetch': 0.4.2
+      '@atproto-labs/pipe': 0.2.5
       ipaddr.js: 2.5.0
-      undici_v6: /undici@6.28.0
-      undici_v7: /undici@7.29.0
-      undici_v8: /undici@8.10.0
-    dev: false
+      undici_v6: /undici@6.29.1
+      undici_v7: /undici@7.30.2
+      undici_v8: /undici@8.12.4
 
-  /@atproto-labs/fetch@0.3.5:
-    resolution: {integrity: sha512-iDFZEoNqfL17EVKE+uNzdUD7YF8LWhEhxeBtP6x+PNuAxoXv3ip9vLmB8nNzNxFwVn++FipfDtSiPqmziv1bdA==}
+  /@atproto-labs/fetch@0.4.2:
+    resolution: {integrity: sha512-9mgISMM2eY/w373HUNrtWq4onPzES1K6DaeAv9BDcEgovcKTkcI60H9Jjp38thU2i/dQaGpKrxmxR9qc0FZocg==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto-labs/pipe': 0.2.4
+      '@atproto-labs/pipe': 0.2.5
 
-  /@atproto-labs/handle-resolver-node@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-O4fYwo4NrXEhcihLcvnOjYaltmwe8UeYiamBVTH5daTcvsuvH1fkZAxXbvBEGlxG0TSXfszwT/lyPX97ClNcZg==}
+  /@atproto-labs/handle-resolver-node@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-9+qnBfI1b+5mrbJeZC0ct7DbohyHegbSDKTEzBxWkOe6FQdiZl1bb0X1XgB7QZ3Ge/BHaUKIDeuAnlrVQOrC8A==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto-labs/fetch-node': 0.0.0-spaces-alpha-20261105160032
-      '@atproto-labs/handle-resolver': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/did': 0.0.0-spaces-alpha-20261105160032
-    dev: false
+      '@atproto-labs/fetch-node': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/handle-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/did': 0.0.0-spaces-alpha-20261112204144
 
-  /@atproto-labs/handle-resolver@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-lmLXB3xLPZLx3ljjHp1BySE9NHpSdWotfmZSf/csNRFqR+SouxN7hPIylTyNEe1fGcrSPS7nMXl5qFV+JDWweA==}
+  /@atproto-labs/handle-resolver@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-nB4K/QTO6p5VcGTFr1TBs/8TwKcFxL/5R71b6WyC8HEBU2f/uNvZMYTMOJr4C/aMdxJ4lShNPykQvKV9j5UhzQ==}
     engines: {node: '>=22'}
     dependencies:
       '@atproto-labs/simple-store': 0.5.1
       '@atproto-labs/simple-store-memory': 0.2.6
-      '@atproto/did': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/did': 0.0.0-spaces-alpha-20261112204144
       zod: 3.25.76
-    dev: false
 
-  /@atproto-labs/identity-resolver@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-IpY6TbqGlJKikEdmgR27bsXeGFcp6aK6+dVXIQw17lg7Jjv1GrfvwT6CjEiCroBO896JEIknfp/qv4lu+YUerg==}
+  /@atproto-labs/identity-resolver@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-2vF2C9cLkXPhKzQEJ1Rbfa1vIjyQUoX8+47nqZYBbovRWiNCfhx1X7gJJ/oQE43ReA8jvm+K54GJzIiXF+bdzg==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261105160032
-      '@atproto-labs/handle-resolver': 0.0.0-spaces-alpha-20261105160032
+      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/handle-resolver': 0.0.0-spaces-alpha-20261112204144
     dev: false
 
-  /@atproto-labs/pipe@0.2.4:
-    resolution: {integrity: sha512-n67jCcrC+ouAeO10cWkpPzzLMlDi/lDCU30Us+LGqhOPhT6c4t5ASdBLQi9W3jUQtRzQBt3G9zipF+xKWNvVbw==}
+  /@atproto-labs/pipe@0.2.5:
+    resolution: {integrity: sha512-1R1nYs/nHmBcYa4yzTjk5H/46MF5nZm342Ha9kKQTOMp/fr2Yn67qD1pTXUS7L2Mx8AEf3m7Z/TTxRfnERLc8w==}
     engines: {node: '>=22'}
 
   /@atproto-labs/simple-store-memory@0.2.6:
@@ -171,293 +170,328 @@ packages:
     resolution: {integrity: sha512-vfvoDhu6ds6BT3Pqe+d2/LBU1WpDRtt69y6zltlfMCoucPm82m1j50/Wb6xTvv+oZ+2j0JyZVXsmXQ12SWYQJg==}
     engines: {node: '>=22'}
 
-  /@atproto/car@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-YDq+BHlfUkDsbOII+BuqQQFtsCSM3+SX6reVgigJbXOJMgn4EgQvb2L5IXLQNvSGMXBHK9Du2ltraOA9X7bBOg==}
+  /@atproto/car@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-wtTmHbgmgcs39n9mun3X1lHyeeGt21+zZ/DrRKoCW37uYSaaF7XbuZB1dVuekSxeDt0biRl9ETS/PEIzb8ACfA==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
       tslib: 2.8.1
       varint: 6.0.0
     dev: true
 
-  /@atproto/common-web@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-mYAUpD1QborMVi6GtJwl4zGQOk1ZYbtxZ8rp7OdH2kYWoqVemSdrm0y27vrA3HMoE+KE7XrMtZAtsaV8IQf8OQ==}
+  /@atproto/common-web@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-q1Pti2tZ3040Q/pgDwlINrshaz0SEso803CkCRt7wb4leQQ8NWb8GpoFUij+v+K35EafA5BtKXfCfI2UeCPA/Q==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-json': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/syntax': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-json': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/syntax': 0.0.0-spaces-alpha-20261112204144
       zod: 3.25.76
 
-  /@atproto/common@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-DVkrueYwAJTO+KKu/IkW+krlixWPuUZHGrzggXt8wrJwenChh5IvtSMbsQM8KnbJX9D9v1xOiyyybqmVIyHVCQ==}
+  /@atproto/common@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-BfrQnuqM3PJ2ILA4ctYsZv/G615tmlhFVOatKLpaKAYRJiYbrud1V5cWAoS+P64B6YDfnEkpxsfrq1d12SI+Mw==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/common-web': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/common-web': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
       multiformats: 13.4.2
       pino: 10.3.1
+    dev: false
 
-  /@atproto/crypto@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-3fKgpldF14VvEn/awMuBUdiJNEqtgu5PIizeMx4puOXTOu6oWZ9p0OqDOdPFqQ7VQOgSGtSZzeCBIMCD+Q4kKQ==}
+  /@atproto/crypto@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-hCvDczNGlchdxlGLk4AMh0rpAQBNC9gem/K8G6SlugS7i+2XwzVT9CWrsLnJNGGSxMhsHGU3aSyYvml59K+GEA==}
     engines: {node: '>=22'}
     dependencies:
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       uint8arrays: 5.1.1
 
-  /@atproto/did@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-aiI8nvHhGVn3c7BY+T/Rpqn8/ydrEsuT8wNSS0tPIimqtEouViZCqEwoTSaM54nif3P6Cs3s/NmsLBFshtRb3Q==}
+  /@atproto/did@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-XA7dEedsSLD15fdHNNGkNChktE8z5Sx/4XUBinR3u41jS2mWNAOUb+Hgy5kvMt45vPUhGEkyjhyI1ClJlHCBRg==}
     engines: {node: '>=22'}
     dependencies:
       zod: 3.25.76
 
-  /@atproto/identity@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-eD0VsntdfWiMZtT/17nb3cDPzko8XipLM1sjSqEifaLQ/WVkLYMNAiq27bQZl0UP6ZPPQfmjkbYoBn4UyAoCFg==}
+  /@atproto/identity@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-slGw1/Cgyq8Ks6BOHR5bCYKWY8e33pwhnyBuYZpdVxj/Ds3G2HrT3Fun3V8XDqLBpU/f989Jgc4ZFZ2iggZkcA==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/common-web': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/crypto': 0.0.0-spaces-alpha-20261105160032
+      '@atproto-labs/fetch-node': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/common-web': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/crypto': 0.0.0-spaces-alpha-20261112204144
     dev: false
 
-  /@atproto/jwk-jose@0.2.4:
-    resolution: {integrity: sha512-gzDoA0JTwnc0ZJOBLM7WX9xFxtynRS2K1Bofb8epzoMWDQvyvfbPcfkdPrKFM7NXCFUVpGpBnsCB8KFPTf1rCg==}
+  /@atproto/jwk-jose@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-a560HC/cWYAl2FWYTQSIoSXeRnhkoKEHeelLH0LcNieRc9pJRshNziUbcpQUZzDO8O0sVfrimz09QotrHObQjQ==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/jwk': 0.7.4
+      '@atproto/jwk': 0.0.0-spaces-alpha-20261112204144
       jose: 5.10.0
     dev: false
 
-  /@atproto/jwk-webcrypto@0.3.4:
-    resolution: {integrity: sha512-UsFIUozqnRecXPo6HgKV4PW4FqYHxX1V3iAe0rRV6Q2RSfYD8V2mZ89pv8NpvJynnaqJArBQ7HZlcg0F4tRYhA==}
+  /@atproto/jwk-webcrypto@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-MYKAgGE17Z9QmHcd9gaQ8guX4iWO7Um/CkceI7C2f5Azsp9/T87JTeP5Dc8o8aWm0CLc9xC9YB7LsrvtX6whbQ==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/jwk': 0.7.4
-      '@atproto/jwk-jose': 0.2.4
+      '@atproto/jwk': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/jwk-jose': 0.0.0-spaces-alpha-20261112204144
       zod: 3.25.76
     dev: false
 
-  /@atproto/jwk@0.7.4:
-    resolution: {integrity: sha512-tq7TUDmNfe1yDfpRgdGQMJdl9TUlJmREQNCag9yg5w8Evu+TOiFiLgiOCbo7X4ouRPSgd1DpOzXbUa8UyKKMZA==}
+  /@atproto/jwk@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-JhcZrh1GGexC0VlP1ad1JLUglMsCR+ryqRK3qcfnAntyIn7FA7uCX9oqg3Jm2lxqm/St2P+HzEys26jNoqshIQ==}
     engines: {node: '>=22'}
     dependencies:
       multiformats: 13.4.2
       zod: 3.25.76
     dev: false
 
-  /@atproto/lex-builder@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-NPiH+H3m6s34Z7FVPsfRPoWcLy0wqoh1y4tDHVb+IDkv80ABA52UgvHqHzkQ9is53igKf4xBc+NsXN2QAZSMng==}
+  /@atproto/lex-builder@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-KKPYDasIPPYDrDs20XDZUR+S5HiFKGXZHN3T5yQLioGXlzR5E7i7CBPoJ1qPMhsHqSy48paGlsh+b96EcOv/Wg==}
     engines: {node: '>=22'}
+    hasBin: true
     dependencies:
-      '@atproto/lex-document': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/lex-document': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
       prettier: 3.9.6
       ts-morph: 27.0.2
       tslib: 2.8.1
+      yargs: 18.2.0
     dev: true
 
-  /@atproto/lex-cbor@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-dO/dTNO7MBEeNpG8gcEe4nnZEYk6sDm1PR0S2GwCeAseO/9XgzJqYar0FhG92zRtimFxfJio5GAKmdVJzFdAjw==}
+  /@atproto/lex-cbor@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-9RORgsnvI0RQTGKJ80Ucz++cWXgY6knaoPqmeZIFLxkRak2mp+4SQp+QNAjtfGtMlzpUqDLiI/kNaa+C0dGm/w==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
       cborg: 4.5.8
       tslib: 2.8.1
 
-  /@atproto/lex-client@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-2vmImywMxhn9n2iDDZiKXdUGYsmKXBbk98s2pq3W3wVJ94R8524cBnEb3eVKqnZry39tR8p26KlgyyuB1GERWQ==}
+  /@atproto/lex-client@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-UHAf925NXxpFNY42UQrMMtcnIPaHWX0R7wDrYe16RKd7y0HPtKDyaP4HLXh2eS4DGA/A+XcpAuM+vIiGGgOm9g==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-json': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-rpc': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
       tslib: 2.8.1
 
-  /@atproto/lex-data@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-oPBQ35NDU5re/b0tRvKm7PKlEzn1LcbJ/L8UpbixOSFwbE33/EYj836WmVY8JESshOkXFcSGjPm0p8Ne//Kiog==}
+  /@atproto/lex-data@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-+91aJCNktoYtmWiMeJ6xaUXzdjQQaBuwTRJaTWmy+dIeq+tOVsnIGqslWIK9zC4306OdmFsd7k7yz3adOhjLdQ==}
     engines: {node: '>=22'}
     dependencies:
       multiformats: 13.4.2
       tslib: 2.8.1
       unicode-segmenter: 0.14.5
 
-  /@atproto/lex-document@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-AWei82KuHFAQ/QG/mqUbNFCfqhKt4jMLjGmsKf0huSnkZUP0NeikIR8OH/AZooJ1vpsY13Y5q/7BKMCc3I7+Sw==}
+  /@atproto/lex-document@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-URa0URI8eyFB0ahFYP6d9zD9Vu3dO0yG1NDF4PVOJk3GNTDI/C84OtMxP1NPz3u3+0ENAdRCjwr1LEvRnuVVOQ==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261105160032
-      core-js: 3.50.0
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
       tslib: 2.8.1
     dev: true
 
-  /@atproto/lex-installer@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-oUGar5m1tLp9GyeXOYLHWHhnrlD9vvwDmWJWDQzJW8rW3i73gV9YlWiQjfVD0ro7zoGWFnEfdPe9C2y8gr3U1Q==}
-    engines: {node: '>=22'}
-    dependencies:
-      '@atproto/lex-builder': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-document': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-resolver': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/syntax': 0.0.0-spaces-alpha-20261105160032
-      tslib: 2.8.1
-    dev: true
-
-  /@atproto/lex-json@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-0wLiDyR1DG9hY55uspAXoe3jqo76WJtG5yae13cTI69lhAeraC7ZPkn5As/L8qIXRBidh4goHBj1RmxqdeRWWg==}
-    engines: {node: '>=22'}
-    dependencies:
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      tslib: 2.8.1
-
-  /@atproto/lex-resolver@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-HaCrrcZX0ZS1NyVdW0+Jxi7zNLL4XwcDFrgfcjDpFxzUl1KnaAyGAYAyQiaSDTGLKTgxg4F1JBjDWGtdmsoz/g==}
-    engines: {node: '>=22'}
-    dependencies:
-      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/crypto': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-client': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-document': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/repo': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/syntax': 0.0.0-spaces-alpha-20261105160032
-      tslib: 2.8.1
-    dev: true
-
-  /@atproto/lex-schema@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-i88pl575dXkJc01l1wJJXMlTdGNyQI0GWVKLaqCqcnF+Q7ZTCWpDw6JHTdpjVxiPEriF3EL9BI98dUOORYEVpw==}
-    engines: {node: '>=22'}
-    dependencies:
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/syntax': 0.0.0-spaces-alpha-20261105160032
-      '@standard-schema/spec': 1.1.0
-      tslib: 2.8.1
-
-  /@atproto/lex@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-BAIndja10iJJz5NZBPXOmqGeh2NNhcTesBfVxGyrU6hdBwEZdUEzGf3hoZRybOnHGq8dsq3Bi9NSRn2kV8SLJA==}
+  /@atproto/lex-installer@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-JIdcoIs8eH3FVt5Yq0v64soXjZCsT5cXu2Zk6bC5Rs1YR4wdhWXpDrvBdouKS4EfiBBkteUvvXXYEet+hJ9AAg==}
     engines: {node: '>=22'}
     hasBin: true
     dependencies:
-      '@atproto/lex-builder': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-client': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-installer': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-json': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261105160032
+      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/fetch-node': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/handle-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/handle-resolver-node': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-builder': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-document': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-rpc': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/syntax': 0.0.0-spaces-alpha-20261112204144
+      prettier: 3.9.6
       tslib: 2.8.1
-      yargs: 18.1.0
+      yargs: 18.2.0
     dev: true
 
-  /@atproto/lexicon@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-6gFzYj8u3c31oxisnbwzthm74z+y41ssniWkqLR5cCYD8K3kG9ggIdZP6c3V4iJQ9NB/vP81oOaDgFDFfBDq3g==}
+  /@atproto/lex-json@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-zRN14kr/BdDDfM+sQzwYgmHmGTtJ6gBFxTFK+4GwArLwfthAcq65N01MnqmvnKqfeVdFAADffHuPsCF/7B90Sw==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/common-web': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/syntax': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      tslib: 2.8.1
+
+  /@atproto/lex-resolver@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-mWXEX/Q0a+UJx1aqY8VDSdgUFwUJhwWjPqecXpDEzbR+i++rSSq9Vgh/Wt7zl8ub5JcVCqJI/M4WxZSHVUNcPA==}
+    engines: {node: '>=22'}
+    dependencies:
+      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/crypto': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-document': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-rpc': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/repo': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/syntax': 0.0.0-spaces-alpha-20261112204144
+      tslib: 2.8.1
+    dev: true
+
+  /@atproto/lex-rpc@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-zENtE1MvAbTIfaNXe8yoCmfE0fDBlkZm+D6j0+Ef03qk+51PtMtBaQ4LaXJm10vNgi5NS4gJ7KIMF22AlWQEYg==}
+    engines: {node: '>=22'}
+    dependencies:
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-json': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
+      tslib: 2.8.1
+
+  /@atproto/lex-schema@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-ArUTVp05xVw7jVV4ZoSNDH29/gd2hjFstXiePKuprZpK9tc9rBeaqvGTdXgbQ6wwltCWdBX9cbpMht1Lzfe7DA==}
+    engines: {node: '>=22'}
+    dependencies:
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/syntax': 0.0.0-spaces-alpha-20261112204144
+      '@standard-schema/spec': 1.1.0
+      tslib: 2.8.1
+
+  /@atproto/lex@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-kXL4z4mPAXuj8ndjpsACtxGTqkQRoNYp88M4p05gsuJfl5xLHbq/4uLYS2n9GF1mnK6TqUmqy1MjkVhcIJGdwA==}
+    engines: {node: '>=22'}
+    hasBin: true
+    dependencies:
+      '@atproto/lex-builder': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-client': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-installer': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-json': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
+      tslib: 2.8.1
+      yargs: 18.2.0
+    dev: true
+
+  /@atproto/lexicon@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-qzq9Jw8e6DsXMn67nECnI31cmO65TgjibbYI7Xd2q8yBdjMm+JPZzNMVNTIocPLMZ5gJPZNa8eBjU1CrS1iAVw==}
+    engines: {node: '>=22'}
+    dependencies:
+      '@atproto/common-web': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/syntax': 0.0.0-spaces-alpha-20261112204144
       multiformats: 13.4.2
       zod: 3.25.76
     dev: false
 
-  /@atproto/oauth-client-node@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-8TtrUULBv63G15g4YqcvB7TH5Ti1cX2nZAB4x6D79RuWg4FU3StrqhxZFmzlknpqf+iybDNJcv+uBcw0EJrqKQ==}
+  /@atproto/oauth-client-node@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-pXZSugbm5RnWrOBchoHXlU9jO+AGIO/01RA4FJ0165hsm0Atwc+6Jj/NueCHCDRufnkvppNBSEZJROe/bQ2zGA==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261105160032
-      '@atproto-labs/handle-resolver-node': 0.0.0-spaces-alpha-20261105160032
+      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/handle-resolver-node': 0.0.0-spaces-alpha-20261112204144
       '@atproto-labs/simple-store': 0.5.1
-      '@atproto/did': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/jwk': 0.7.4
-      '@atproto/jwk-jose': 0.2.4
-      '@atproto/jwk-webcrypto': 0.3.4
-      '@atproto/oauth-client': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/oauth-types': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/did': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/jwk': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/jwk-jose': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/jwk-webcrypto': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/oauth-client': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/oauth-types': 0.0.0-spaces-alpha-20261112204144
     dev: false
 
-  /@atproto/oauth-client@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-yrgioKn0jPYmzDxHUMHXAoM1RaYekIKJPMRs3EpTRhcNNiZj2e/RZquqWAf2IW+1vk5EspDNPvCL5wMs6hfOkw==}
+  /@atproto/oauth-client@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-Jzlp2T7WTmdQ+7YVUt2GsY3/NQY/ixneBdKGnDVdGnd10V5OnG7PP4nt/sQGIL8cqBRywYxrsLIAV+4DNnfCrw==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261105160032
-      '@atproto-labs/fetch': 0.3.5
-      '@atproto-labs/handle-resolver': 0.0.0-spaces-alpha-20261105160032
-      '@atproto-labs/identity-resolver': 0.0.0-spaces-alpha-20261105160032
+      '@atproto-labs/did-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/fetch': 0.4.2
+      '@atproto-labs/handle-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/identity-resolver': 0.0.0-spaces-alpha-20261112204144
       '@atproto-labs/simple-store': 0.5.1
       '@atproto-labs/simple-store-memory': 0.2.6
-      '@atproto/did': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/jwk': 0.7.4
-      '@atproto/oauth-types': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/xrpc': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/did': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/jwk': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/oauth-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/oauth-types': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/xrpc': 0.0.0-spaces-alpha-20261112204144
       core-js: 3.50.0
       multiformats: 13.4.2
       zod: 3.25.76
     dev: false
 
-  /@atproto/oauth-scopes@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-7F7I5mATu78oF3EE/ujjmn3O3z7szGNiFoVm1cX0HOp99phVUoKud/bo4LuaK6fb9WeJ/vwneMDCmxd1BFNOUg==}
+  /@atproto/oauth-resolver@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-givAH5Zk0dZVa3F1LOpw934XCG4gYwIfrl1jam9maecwpWZ2aTPA7CiRX6QhWEcXoAKAGgc8LcAWBv453crztg==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/did': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/syntax': 0.0.0-spaces-alpha-20261105160032
-    dev: false
-
-  /@atproto/oauth-types@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-eXF+KRdhVlvkIdnIqzR9QPyI+jakNsp2fsMuTO3NZmV7libBm19BJbhSHEywF98ZMLbRIEU9WgQfa60XtwCCdQ==}
-    engines: {node: '>=22'}
-    dependencies:
-      '@atproto/did': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/jwk': 0.7.4
+      '@atproto-labs/fetch': 0.4.2
+      '@atproto-labs/identity-resolver': 0.0.0-spaces-alpha-20261112204144
+      '@atproto-labs/simple-store': 0.5.1
+      '@atproto-labs/simple-store-memory': 0.2.6
+      '@atproto/did': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/oauth-types': 0.0.0-spaces-alpha-20261112204144
       zod: 3.25.76
     dev: false
 
-  /@atproto/repo@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-nqC7dakknV0dWHoyA6YJuVs1IRHJm7Smfq7Mp/SeFjjNCaGm5CRABzraeUd8ebk6ot+mBbvqhh7TTek+cWwzJA==}
+  /@atproto/oauth-scopes@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-7yuQRB368bfds1jPd/z5mUjSjyNk+xnx5vucVVrKSLDYXIfdmkicsS4e+d3E7xmdBqhFktVSpL7H7f09TgIMAQ==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/car': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/common': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/common-web': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/crypto': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/syntax': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/did': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/syntax': 0.0.0-spaces-alpha-20261112204144
+    dev: false
+
+  /@atproto/oauth-types@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-KOr69pUlkfyBwsVXkC2/1LpKYH/mz0eg5FU0AQzu3kHSFk7+ohgnsx2pvcg85Y/AvjsvzGD3+ncPspd5pn1Cnw==}
+    engines: {node: '>=22'}
+    dependencies:
+      '@atproto/did': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/jwk': 0.0.0-spaces-alpha-20261112204144
+      zod: 3.25.76
+    dev: false
+
+  /@atproto/repo@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-hXAkZFkr2d2dkYsErdBfn2Xd9J9SlElbn1It/yMgM36XIIsk1bEdhrDmUNKWfUXd7LV8C/S8DhW4XLslvU8fEw==}
+    engines: {node: '>=22'}
+    dependencies:
+      '@atproto/car': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/common-web': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/crypto': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/syntax': 0.0.0-spaces-alpha-20261112204144
       zod: 3.25.76
     dev: true
 
-  /@atproto/space@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-+ICI+XXW0pNYRE01aq+xZZurza9j0VrVrE3mG/Gv9F+rBioSv+99miExXF6A/naJW+jIPgFrgc8a753nKWmSzg==}
+  /@atproto/space@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-vrgINVJcTnWsHjNW8xNuuVD2Y2/XFy2UNzg00+9slXFffXAXMXRBxIpdqtOIEYRHQ0YkW0A9b3TXNdxcMmNuTw==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/crypto': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/star': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/syntax': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/crypto': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/star': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/syntax': 0.0.0-spaces-alpha-20261112204144
       '@noble/hashes': 1.8.0
       structured-headers: 1.0.1
-      zod: 3.25.76
     dev: false
 
-  /@atproto/star@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-MTeZW52Ym8gPUxcWdDOFqzHi9qgVZy6B7ZbenjRGL84sPWtKwZDKJstUmp0NgH8TykcklZOjmO1X10v0QBximQ==}
+  /@atproto/star@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-/CxyfM7LEZ6XKFgU6JwKw4mr4MrM/l26WYjzbNyoW8nUvYQtxCqDBXV7ApVM9Jo8Cv6HrfUbxAl9HT/9qFKaqQ==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
     dev: false
 
-  /@atproto/syntax@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-XW+S/xGd3AbmLLtOIxhTKjZWvq+dI3YoXX2UD7IKt4VJCBW0/LMTV/esh24m1jWzj1wNjnmPgPDpUIr3NWrgPQ==}
+  /@atproto/syntax@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-3qoGi/vxD/gOzb3u/W0deqR9CqZquU20rOLq2tpW66ufFMcuMnSFHMGSmOaDL7yrdz0xDfh22vPu8WWFQDG0Dg==}
     engines: {node: '>=22'}
     dependencies:
       iso-datestring-validator: 2.2.2
       tslib: 2.8.1
 
-  /@atproto/ws-client@0.2.1:
-    resolution: {integrity: sha512-HCGkqH/Ksxpgg/xCyIvH5hK6o8Lg2PxcEA790GCEV9MspCZB/xIesHZVgJN0cEvklGe+6pNCOZE1B5kj9q1ONA==}
+  /@atproto/ws-client@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-8k16/auYN80tE+Ssfb9RZkW44p7LTvLJOd+xCP+YukuXfkkdJHtYSM65R4p+H4GC49AKC8fyZEIpgDZSdl4p8A==}
     engines: {node: '>=22'}
     dependencies:
       ws: 8.21.3
@@ -466,20 +500,21 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@atproto/xrpc-server@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-LIv4nyekvtjgiKl59lALlvnlMiDpwJltIFyZu/GH3CbfI5Z0gwTX9xvAW3XnjgSSHqFqk0CriLB6l5duM7E03g==}
+  /@atproto/xrpc-server@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-y72SXKmYZh5PGZKIjM60faqFojSNL8QMouylydGIXPMDKBuhSc7UZlzJeN8oyrhQpvapcurg/oFr7SzyVVQWRg==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/common': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/crypto': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-client': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-data': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-json': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/lexicon': 0.0.0-spaces-alpha-20261105160032
-      '@atproto/ws-client': 0.2.1
-      '@atproto/xrpc': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/common': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/crypto': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-cbor': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-client': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-data': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-json': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lex-schema': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/lexicon': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/ws-client': 0.0.0-spaces-alpha-20261112204144
+      '@atproto/xrpc': 0.0.0-spaces-alpha-20261112204144
+      body-parser: 1.20.9
       express: 4.22.2
       http-errors: 2.0.1
       mime-types: 3.0.2
@@ -491,11 +526,11 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@atproto/xrpc@0.0.0-spaces-alpha-20261105160032:
-    resolution: {integrity: sha512-uT9Z5hsxdRiO96b2Os1CdmIauDM61zydNmv4C5sga2wFnP3K+Acgn3ETF1bICqrDDdyKXACS1yvZD2/5/ks6dg==}
+  /@atproto/xrpc@0.0.0-spaces-alpha-20261112204144:
+    resolution: {integrity: sha512-SIP4nTss4Uyyx3qL1oJSwtMcz4cD8ThvgPSS6080+bObh8CCqswccCLfEZksq5kVzO6Nl7A9RGuXz7sDAp7nTw==}
     engines: {node: '>=22'}
     dependencies:
-      '@atproto/lexicon': 0.0.0-spaces-alpha-20261105160032
+      '@atproto/lexicon': 0.0.0-spaces-alpha-20261112204144
       zod: 3.25.76
     dev: false
 
@@ -1400,6 +1435,7 @@ packages:
 
   /@pinojs/redact@0.4.0:
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
+    dev: false
 
   /@rtsao/scc@1.1.0:
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
@@ -1952,6 +1988,7 @@ packages:
   /atomic-sleep@1.0.0:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
+    dev: false
 
   /available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -2011,8 +2048,8 @@ packages:
       readable-stream: 3.6.2
     dev: false
 
-  /body-parser@1.20.6:
-    resolution: {integrity: sha512-p5tAzS57i5MV9fZFDj9LeIiTZEufbSe2eDozP+ElheSUq1m74CRq1jI4mYNDdVs9vQztXFLuk/Gd6BWTdwRJ5g==}
+  /body-parser@1.20.9:
+    resolution: {integrity: sha512-FISIQxV5u91Y9gvuFq3q/tA/qTqLJn3AhRcEvyozyhJTh5OBFFtv827AdHU7Rbyct4r+Ba1/99oFa1Y3yuFsdw==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
     dependencies:
       bytes: 3.1.2
@@ -2023,7 +2060,7 @@ packages:
       http-errors: 2.0.1
       iconv-lite: 0.4.24
       on-finished: 2.4.1
-      qs: 6.15.3
+      qs: 6.16.2
       raw-body: 2.5.3
       type-is: 1.6.18
       unpipe: 1.0.0
@@ -2182,6 +2219,7 @@ packages:
   /core-js@3.50.0:
     resolution: {integrity: sha512-BRWgOLKkFeCgRudR6zrs8p9XJZcE14grzKMMssoYrk6krtuEZ7MTKPIY5RzOnqsEKIR9kst7wNzphttraT+Yqw==}
     requiresBuild: true
+    dev: false
 
   /cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -2849,7 +2887,7 @@ packages:
     dependencies:
       accepts: 1.3.8
       array-flatten: 1.1.1
-      body-parser: 1.20.6
+      body-parser: 1.20.9
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookie: 0.7.2
@@ -3251,7 +3289,6 @@ packages:
   /ipaddr.js@2.5.0:
     resolution: {integrity: sha512-aq+t5NAc+cS6rZQQVWC2x98CPqGtKKTMDd4Gaodv0wShnItdKg/51djkGJ1hqH+Oy0ivDftCbSLCQob8zso01w==}
     engines: {node: '>= 10'}
-    dev: false
 
   /is-array-buffer@3.0.5:
     resolution: {integrity: sha512-DDfANUiiG2wC1qawP66qlTugJeL5HyzMpfr8lLK+jMQirGzNod0B12cFB/9q838Ru27sBwfw78/rdoU7RERz6A==}
@@ -3835,6 +3872,7 @@ packages:
   /on-exit-leak-free@2.1.2:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
     engines: {node: '>=14.0.0'}
+    dev: false
 
   /on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
@@ -3936,9 +3974,11 @@ packages:
     resolution: {integrity: sha512-wlfUczU+n7Hy/Ha5j9a/gZNy7We5+cXp8YL+X+PG8S0KXxw7n/JXA3c46Y0zQznIJ83URJiwy7Lh56WLokNuxg==}
     dependencies:
       split2: 4.2.0
+    dev: false
 
   /pino-std-serializers@7.1.0:
     resolution: {integrity: sha512-BndPH67/JxGExRgiX1dX0w1FvZck5Wa4aal9198SrRhZjH3GxKQUKIBnYJTdj2HDN3UQAS06HlfcSbQj2OHmaw==}
+    dev: false
 
   /pino@10.3.1:
     resolution: {integrity: sha512-r34yH/GlQpKZbU1BvFFqOjhISRo1MNx1tWYsYvmj6KIRHSPMT2+yHOEb1SG6NMvRoHRF0a07kCOox/9yakl1vg==}
@@ -3955,6 +3995,7 @@ packages:
       safe-stable-stringify: 2.5.0
       sonic-boom: 4.2.1
       thread-stream: 4.2.0
+    dev: false
 
   /possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -4003,6 +4044,7 @@ packages:
 
   /process-warning@5.1.0:
     resolution: {integrity: sha512-jQSaVHsPgtyw60e1rQ/A+/ArPEj/S8pS/vFnyGa/gYFXrKk/6RuDkoqVDQ5NI5MmS01698ltlAk0NoDBNLujRw==}
+    dev: false
 
   /prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
@@ -4040,12 +4082,21 @@ packages:
       side-channel: 1.1.1
     dev: false
 
+  /qs@6.16.2:
+    resolution: {integrity: sha512-VYdnB5S7/0IeXzBacUtwNAaM6d7Y/PgYnNC7bJCI6meqA/OgnsQbZMtVW8Dt2D1PHgbHGtYmhSoEIgvt7xZ2ZA==}
+    engines: {node: '>=0.6'}
+    dependencies:
+      es-define-property: 1.0.1
+      side-channel: 1.1.1
+    dev: false
+
   /queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
     dev: true
 
   /quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
+    dev: false
 
   /range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -4106,9 +4157,11 @@ packages:
   /real-require@0.2.0:
     resolution: {integrity: sha512-57frrGM/OCTLqLOAh0mhVA9VBMHd+9U7Zb2THMGdBUoZVOtGbJzjxsYGDJ3A9AYYCP4hn6y1TVbaOfzWtm5GFg==}
     engines: {node: '>= 12.13.0'}
+    dev: false
 
   /real-require@1.0.0:
     resolution: {integrity: sha512-P4nbQYQfePJxRSmY+v/KINxVucm4NF3p3s7pJveMTtom52FR4YGltUQLB8idDXwDDWW+eYrWDFbuzUnjoWHF7g==}
+    dev: false
 
   /reflect.getprototypeof@1.0.10:
     resolution: {integrity: sha512-00o4I+DVrefhv+nX0ulyi3biSHCPDe+yLv5o/p6d/UVlirijB8E16FtfwSAi4g3tcqrQ4lRAqQSoFEZJehYEcw==}
@@ -4204,6 +4257,7 @@ packages:
   /safe-stable-stringify@2.5.0:
     resolution: {integrity: sha512-b3rppTKm9T+PsVCBEOUR46GWI7fdOs00VKZ1+9c1EWDaDMvjQc6tUwuFyIprgGgTcWoVHSKrU8H31ZHA2e0RHA==}
     engines: {node: '>=10'}
+    dev: false
 
   /safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
@@ -4390,6 +4444,7 @@ packages:
     resolution: {integrity: sha512-w6AxtubXa2wTXAUsZMMWERrsIRAdrK0Sc+FUytWvYAhBJLyuI4llrMIC1DtlNSdI99EI86KZum2MMq3EAZlF9Q==}
     dependencies:
       atomic-sleep: 1.0.0
+    dev: false
 
   /source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -4399,6 +4454,7 @@ packages:
   /split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
+    dev: false
 
   /stable-hash@0.0.5:
     resolution: {integrity: sha512-+L3ccpzibovGXFK+Ap/f8LOS0ahMrHTf3xu7mMLSpEGU0EO9ucaysSylKo9eRDFNhWve/y275iPmIZ4z39a9iA==}
@@ -4590,6 +4646,7 @@ packages:
     engines: {node: '>=20'}
     dependencies:
       real-require: 1.0.0
+    dev: false
 
   /tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
@@ -4757,20 +4814,17 @@ packages:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
     dev: true
 
-  /undici@6.28.0:
-    resolution: {integrity: sha512-LIY910g9TI13YS95lrMFrs8Rm/u/irgHeTWoKCoteeJ04CUJ92eEfj0rVn+7VKMPBpUPiUoBKfhNyLI23EE/KA==}
+  /undici@6.29.1:
+    resolution: {integrity: sha512-EvRlUt/QqAEvXdQeRMYUfwOQsfzpDztykrG2owGEE/rBOBoYv9uF39ZzsNDh4lTFHhTr2XOZjKkYgueD12ZmGA==}
     engines: {node: '>=18.17'}
-    dev: false
 
-  /undici@7.29.0:
-    resolution: {integrity: sha512-IDxfleLmmbSskfWSUATiN1nfn2rDuvnMOqb5CWR92iIfojA0Ud+ulOAAEQ57LPr9rWmsreUyf5lwyao+7GNNVw==}
+  /undici@7.30.2:
+    resolution: {integrity: sha512-mLyPQnHwUxaM/rideoK/+KL8DaAJLRl4aBCfmX444aCSLnIaomqPLtNRe2jdCYcsk5wZzXrDIQC8ZeYNRAYyIA==}
     engines: {node: '>=20.18.1'}
-    dev: false
 
-  /undici@8.10.0:
-    resolution: {integrity: sha512-HvltHd7avK13QIw/oLe4qoOLyoVSoafqJ2jYOrtMRBkbYT31eiBQ8O0ehRKZiEZCMEyLFQNIADpgCWC5fALvYQ==}
+  /undici@8.12.4:
+    resolution: {integrity: sha512-8Mx+uNKKER2bA4AdtedkqRbwUCIJFr2nJckXRe5yrDqzePqwLP7VNcctN8/XdmDSbF7mS+jJKIszlL+vbam1VA==}
     engines: {node: '>=22.19.0'}
-    dev: false
 
   /unicode-segmenter@0.14.5:
     resolution: {integrity: sha512-jHGmj2LUuqDcX3hqY12Ql+uhUTn8huuxNZGq7GvtF6bSybzH3aFgedYu/KTzQStEgt1Ra2F3HxadNXsNjb3m3g==}
@@ -4949,8 +5003,8 @@ packages:
     engines: {node: ^20.19.0 || ^22.12.0 || >=23}
     dev: true
 
-  /yargs@18.1.0:
-    resolution: {integrity: sha512-2rAgRKu54VsHkqI0/tYkmluGXHD4KW7yZoycuqDQ15QOTnc2VVfy0nN/1eMhnQLO00A+dwtK20xuCnc1YGeUyg==}
+  /yargs@18.2.0:
+    resolution: {integrity: sha512-9OpKOLeaoNFecEp7P6iYbzze/5CqWoH7N3SMs/6y1XF4nMvFMspEGZzJ6uFi9MmQwXhyzqYoSEKO3tvA3Z/o2w==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=23}
     dependencies:
       cliui: 9.0.1

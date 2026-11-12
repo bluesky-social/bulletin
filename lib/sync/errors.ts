@@ -25,7 +25,7 @@ export function isSpaceNotFoundError(error: unknown): boolean {
 export function isSpaceAccessDeniedError(error: unknown): boolean {
   return (
     error instanceof LexError &&
-    (error.error === "UserNotAuthorized" || error.error === "NotAuthorized")
+    (error.error === "AccountNotAuthorized" || error.error === "NotAuthorized")
   );
 }
 

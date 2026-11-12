@@ -1,11 +1,13 @@
+import { timingSafeEqual } from "node:crypto";
 import { parseCid } from "@atproto/lex-data";
 import { asStringFormat } from "@atproto/lex-schema";
 import {
   RepoCommit,
-  RepoVerificationError,
+  SpaceError,
   verifyCommit,
   verifyRepoStarFull,
-  type Commit,
+  type SpaceCommit,
+  type VerifyMacParams,
 } from "@atproto/space";
 import {
   REMOVAL_COLLECTION,
@@ -15,6 +17,7 @@ import {
 } from "../config";
 import {
   applySyncedChanges,
+  deleteSyncedRepos,
   deleteSyncedReposExcept,
   deleteSyncedSpace,
   getSyncedRepo,
@@ -39,6 +42,7 @@ import { resolvePds } from "../atproto/identity";
 import { getFollowersAmong } from "../atproto/follows";
 import {
   mintSpaceCredential,
+  type NotifyRegistration,
   type SpaceCredential,
 } from "../atproto/space-credential";
 import { orderCredentialCandidates } from "./credential-candidates";
@@ -54,12 +58,10 @@ import {
   registrationRenewalDelay,
 } from "./registration";
 
+/** A repoWrite or repoRemoved update from notifySpaceUpdate. */
 type NotifyInput = {
   space: string;
-  repo: string;
-  repoRev: string;
   spaceRev: string;
-  prevSpaceRev?: string;
 };
 type OnChange = (space: string) => void;
 type SyncedBlob = SpaceBlob & { bytes: Uint8Array };
@@ -78,7 +80,8 @@ export class SyncEngine {
 
   constructor(
     private readonly onChange: OnChange,
-    private readonly managingAppService: string,
+    /** Base URL registered for notifySpaceUpdate, if notifications are enabled. */
+    private readonly notifyEndpoint?: string,
   ) {}
 
   async resume(): Promise<void> {
@@ -132,6 +135,7 @@ export class SyncEngine {
         authorityDid,
         spaceRev: null,
         registrationExpiresAt: null,
+        notifyToken: null,
         lastError: null,
       };
     this.bindWatch(watch);
@@ -147,7 +151,9 @@ export class SyncEngine {
     this.assertWatchActive(watch);
     const newlyInserted = !existing;
     if (newlyInserted) {
-      await saveSpaceWatch({ spaceUri: space, authorityDid });
+      // Registered with notify from the next authorization on, once the space host
+      // can confirm the stored token.
+      watch.notifyToken = await saveSpaceWatch({ spaceUri: space, authorityDid });
       if (this.isWatchInactive(watch)) {
         await this.startWatchRemoval(space);
         throw new WatchInvalidatedError();
@@ -195,6 +201,53 @@ export class SyncEngine {
       }
       throw error;
     }
+  }
+
+  /**
+   * Reauthorize after a spaceDeleted or registrationExpired notice. Only a
+   * SpaceDeleted answer drops the space; otherwise this renews the registration
+   * and catches up from the checkpoint.
+   */
+  async reauthorize(space: string): Promise<void> {
+    if (this.removals.has(space)) return;
+    const generation = this.spaceGenerations.get(space) ?? 0;
+    const watch = (await listSpaceWatches()).find(
+      (item) => item.spaceUri === space,
+    );
+    if (
+      !watch ||
+      this.removals.has(space) ||
+      generation !== (this.spaceGenerations.get(space) ?? 0)
+    ) {
+      return;
+    }
+    this.watchGenerations.set(watch, generation);
+    try {
+      await this.renewRegistration(watch);
+    } catch (error) {
+      // withCredential has already dropped a deleted space.
+      if (isSpaceDeletedError(error)) return;
+      if (isInvalidWatchError(error)) {
+        await this.removeWatch(watch);
+        return;
+      }
+      if (this.isWatchInactive(watch)) return;
+      this.scheduleReconcileRetry(watch);
+      await this.recordError(watch.spaceUri, error);
+      throw error;
+    }
+  }
+
+  /** Whether `token` is the one this syncer registered for `space`. */
+  async isNotifyToken(space: string, token: string): Promise<boolean> {
+    if (!this.notifyEndpoint || this.removals.has(space)) return false;
+    const watch = (await listSpaceWatches()).find(
+      (item) => item.spaceUri === space,
+    );
+    if (!watch?.notifyToken) return false;
+    const expected = Buffer.from(watch.notifyToken);
+    const actual = Buffer.from(token);
+    return expected.length === actual.length && timingSafeEqual(expected, actual);
   }
 
   async deleteSpace(
@@ -249,25 +302,9 @@ export class SyncEngine {
       let changed = false;
       const authorityPds = await resolvePds(watch.authorityDid);
       const authorityClient = credential.client(authorityPds, watch.authorityDid);
-      let registrationExpiresAt = watch.registrationExpiresAt;
-      if (registrationNeedsRenewal(watch.registrationExpiresAt)) {
-        const registered = await authorityClient.call(
-          com.atproto.space.registerNotify,
-          {
-            space: asStringFormat(watch.spaceUri, "space-ref"),
-            service: this.managingAppService,
-          },
-        );
-        registrationExpiresAt = registered.expiresAt;
-        if (this.isWatchInactive(watch)) return;
-        await updateSpaceWatch({
-          spaceUri: watch.spaceUri,
-          registrationExpiresAt,
-          lastError: null,
-        });
-      }
-      if (registrationExpiresAt) {
-        this.scheduleRegistrationRenewal(watch, registrationExpiresAt);
+      // The credential's authorization registered for notifications.
+      if (credential.authorization.notifyToken) {
+        this.scheduleRegistrationRenewal(watch, credential.expiresAt);
       }
 
       // Reload inside the serialized pass: another notification may have advanced it.
@@ -277,20 +314,31 @@ export class SyncEngine {
         )?.spaceRev ?? undefined;
       const listAndSync = (cursor?: string) =>
         walkSpaceRepos(
-          (cursor) => authorityClient.call(com.atproto.space.listRepos, {
+          (cursor) => authorityClient.call(com.atproto.space.listWriters, {
             space: asStringFormat(watch.spaceUri, "space-ref"),
             limit: 1000,
             cursor,
           }),
           async (repo) => {
             this.assertWatchActive(watch);
-            let local = await getSyncedRepo(watch.spaceUri, repo.did);
+            if (repo.removed) {
+              // Removed from the writer set: its records stay on its host, but
+              // are no longer part of the board.
+              await this.enqueue(watch.spaceUri, repo.repo, async () => {
+                if (this.isWatchInactive(watch)) return;
+                if (await deleteSyncedRepos(watch.spaceUri, [repo.repo])) {
+                  changed = true;
+                }
+              });
+              return;
+            }
+            let local = await getSyncedRepo(watch.spaceUri, repo.repo);
             if (!local || local.rev < repo.repoRev) {
-              await this.enqueue(watch.spaceUri, repo.did, () =>
-                this.syncRepoWithCredential(watch, repo.did, credential),
+              await this.enqueue(watch.spaceUri, repo.repo, () =>
+                this.syncRepoWithCredential(watch, repo.repo, credential),
               );
               changed = true;
-              local = await getSyncedRepo(watch.spaceUri, repo.did);
+              local = await getSyncedRepo(watch.spaceUri, repo.repo);
             }
             if (!local || local.rev < repo.repoRev) {
               throw new Error("Repo host has not reached the listed revision");
@@ -300,7 +348,7 @@ export class SyncEngine {
         );
       let listing = await listAndSync(checkpoint);
       // Keep the existing periodic inventory/pruning behavior. Incremental pages
-      // alone cannot tell us which writers have been removed from the space.
+      // report removals, but a space host may garbage collect removed writers.
       if (!catchUpOnly && checkpoint) listing = await listAndSync();
 
       if (this.isWatchInactive(watch)) return;
@@ -397,24 +445,24 @@ export class SyncEngine {
   }
 
   private async renewRegistration(watch: SpaceWatch): Promise<void> {
-    await this.withCredential(watch, async (credential) => {
-      const authorityPds = await resolvePds(watch.authorityDid);
-      const authorityClient = credential.client(authorityPds, watch.authorityDid);
-      const registered = await authorityClient.call(
-        com.atproto.space.registerNotify,
-        {
-          space: asStringFormat(watch.spaceUri, "space-ref"),
-          service: this.managingAppService,
-        },
-      );
-      if (this.isWatchInactive(watch)) return;
-      await updateSpaceWatch({
-        spaceUri: watch.spaceUri,
-        registrationExpiresAt: registered.expiresAt,
-        lastError: null,
-      });
-      this.scheduleRegistrationRenewal(watch, registered.expiresAt);
-    });
+    // Reauthorizing renews the registration, even with nothing new to read.
+    this.credentials.delete(watch.spaceUri);
+    const credential = await this.withCredential(
+      watch,
+      async (credential) => credential,
+    );
+    if (this.isWatchInactive(watch)) return;
+    if (credential.authorization.notifyToken) {
+      this.scheduleRegistrationRenewal(watch, credential.expiresAt);
+    }
+    // Notifications are best effort. Catch up if the space is past the checkpoint.
+    const { spaceRev } = credential.authorization;
+    const checkpoint = (await listSpaceWatches()).find(
+      (item) => item.spaceUri === watch.spaceUri,
+    )?.spaceRev;
+    if (spaceRev && (!checkpoint || spaceRev > checkpoint)) {
+      await this.runReconcile(watch, true);
+    }
   }
 
   private scheduleRegistrationRenewal(
@@ -481,8 +529,8 @@ export class SyncEngine {
       const state = RepoCommit.fromState(local.ltHash);
       const changes: SyncedChange[] = [];
       let cursor: string | undefined;
-      let commit: Commit | undefined;
-      let commitMac: { sharedSecret: Uint8Array; mac: Uint8Array } | undefined;
+      let commit: SpaceCommit | undefined;
+      let commitMac: VerifyMacParams | undefined;
 
       do {
         const macRequest = await credential.requestCommitMac(repoDid);
@@ -515,21 +563,20 @@ export class SyncEngine {
           if (change) changes.push(change);
         }
         cursor = page.cursor;
-        if (page.commit) {
-          commit = asCommit(page.commit);
-          commitMac = macRequest.params(response.headers);
-        }
+        // Every page carries the current commit. The last page's is compared.
+        commit = asCommit(page.commit);
+        commitMac = macRequest.params(response.headers);
       } while (cursor);
 
       if (!commit || !commitMac) {
         throw new Error("Incremental sync did not reach a commit");
       }
-      const valid = verifyCommit(commit, {
-        space: watch.spaceUri,
-        repo: repoDid,
+      verifyCommit(commit, {
+        space: asStringFormat(watch.spaceUri, "space-ref"),
+        repo: asStringFormat(repoDid, "did"),
         ...commitMac,
       });
-      if (!valid || !state.matches(commit)) {
+      if (!state.matches(commit)) {
         throw new Error("Incremental sync hash mismatch");
       }
 
@@ -581,10 +628,15 @@ export class SyncEngine {
       try {
         recovered = await verifyRepoStarFull(
           [new Uint8Array(await response.arrayBuffer())],
-          { space, repo: repoDid, ...macRequest.params(response.headers) },
+          {
+            space: asStringFormat(space, "space-ref"),
+            repo: asStringFormat(repoDid, "did"),
+            ...macRequest.params(response.headers),
+          },
         );
       } catch (error) {
-        if (attempt > 0 || !(error instanceof RepoVerificationError)) throw error;
+        // MAC, KEM, and repo verification failures all extend SpaceError.
+        if (attempt > 0 || !(error instanceof SpaceError)) throw error;
       }
     }
     const posts: Parameters<typeof replaceRepoRecords>[0]["posts"] = [];
@@ -719,9 +771,17 @@ export class SyncEngine {
     watch: SpaceWatch,
     refresh = false,
   ): Promise<SpaceCredential> {
+    const notify = this.notifyFor(watch);
     if (!refresh) {
       const existing = this.credentials.get(watch.spaceUri);
-      if (existing && !existing.needsRefresh()) return existing;
+      // A credential keeps a registration alive only if it was authorized with it.
+      if (
+        existing &&
+        !existing.needsRefresh() &&
+        existing.authorization.notifyToken === notify?.token
+      ) {
+        return existing;
+      }
       this.credentials.delete(watch.spaceUri);
     }
     const sessionDids = await listStoredSessionDids();
@@ -731,8 +791,12 @@ export class SyncEngine {
     if (sessionDids.includes(watch.authorityDid)) {
       try {
         const session = await oauthClient.restore(watch.authorityDid);
-        const credential = await mintSpaceCredential(session, watch.spaceUri);
-        this.credentials.set(watch.spaceUri, credential);
+        const credential = await mintSpaceCredential(
+          session,
+          watch.spaceUri,
+          notify,
+        );
+        await this.cacheCredential(watch, credential);
         return credential;
       } catch (error) {
         if (isSpaceDeletedError(error) || isSpaceNotFoundError(error)) {
@@ -757,8 +821,12 @@ export class SyncEngine {
     for (const did of candidates) {
       try {
         const session = await oauthClient.restore(did);
-        const credential = await mintSpaceCredential(session, watch.spaceUri);
-        this.credentials.set(watch.spaceUri, credential);
+        const credential = await mintSpaceCredential(
+          session,
+          watch.spaceUri,
+          notify,
+        );
+        await this.cacheCredential(watch, credential);
         return credential;
       } catch (error) {
         if (isSpaceDeletedError(error) || isSpaceNotFoundError(error)) {
@@ -770,6 +838,27 @@ export class SyncEngine {
     }
 
     throw lastError ?? new Error("No authorized OAuth session can sync this board");
+  }
+
+  private notifyFor(watch: SpaceWatch): NotifyRegistration | undefined {
+    if (!this.notifyEndpoint || !watch.notifyToken) return undefined;
+    return { endpoint: this.notifyEndpoint, token: watch.notifyToken };
+  }
+
+  private async cacheCredential(
+    watch: SpaceWatch,
+    credential: SpaceCredential,
+  ): Promise<void> {
+    this.credentials.set(watch.spaceUri, credential);
+    if (!credential.authorization.notifyToken || this.isWatchInactive(watch)) {
+      return;
+    }
+    // The registration now lasts as long as this credential.
+    await updateSpaceWatch({
+      spaceUri: watch.spaceUri,
+      registrationExpiresAt: credential.expiresAt,
+      lastError: null,
+    });
   }
 
   private enqueue(space: string, repo: string, job: () => Promise<void>): Promise<void> {
@@ -937,19 +1026,15 @@ function authorityFromSpace(space: string): string {
   return authority;
 }
 
-function registrationNeedsRenewal(expiresAt: string | null): boolean {
-  return !expiresAt || Date.parse(expiresAt) - Date.now() < 60 * 60 * 1000;
-}
-
 function asCommit(commit: {
   ver: number;
   repo: string;
   space: string;
   rev: string;
   data: Uint8Array;
-}): Commit {
+}): SpaceCommit {
   if (commit.ver !== 1) throw new Error(`Unsupported commit version ${commit.ver}`);
-  return commit as Commit;
+  return commit as SpaceCommit;
 }
 
 function stripPost(value: Extract<SyncedChange, { kind: "post" }>["value"]) {

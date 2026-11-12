@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { sql, type Kysely } from "kysely";
 import { deleteBlobFile } from "../blob-store";
 import type { NoteImage } from "../note-image";
@@ -41,6 +42,8 @@ export type SpaceWatch = {
   authorityDid: string;
   spaceRev: string | null;
   registrationExpiresAt: string | null;
+  /** Identifies this syncer's notification registration for the space. */
+  notifyToken: string | null;
   lastError: string | null;
 };
 
@@ -164,15 +167,17 @@ export async function listBoards(): Promise<
     .execute();
 }
 
+/** Returns the space's notify token, which stays the same across saves. */
 export async function saveSpaceWatch(input: {
   spaceUri: string;
   authorityDid: string;
-}): Promise<void> {
-  await getQueryDb()
+}): Promise<string | null> {
+  const row = await getQueryDb()
     .insertInto("syncSpace")
     .values({
       ...input,
       registrationExpiresAt: null,
+      notifyToken: randomBytes(32).toString("hex"),
       spaceRev: null,
       lastError: null,
       updatedAt: new Date().toISOString(),
@@ -183,7 +188,9 @@ export async function saveSpaceWatch(input: {
         updatedAt: eb.ref("excluded.updatedAt"),
       })),
     )
-    .execute();
+    .returning("notifyToken")
+    .executeTakeFirstOrThrow();
+  return row.notifyToken;
 }
 
 export async function listSpaceWatches(): Promise<SpaceWatch[]> {
@@ -194,6 +201,7 @@ export async function listSpaceWatches(): Promise<SpaceWatch[]> {
       "authorityDid",
       "spaceRev",
       "registrationExpiresAt",
+      "notifyToken",
       "lastError",
     ])
     .execute();
@@ -328,7 +336,22 @@ export async function deleteSyncedReposExcept(
   const staleRepoDids = localRepos
     .map(({ repoDid }) => repoDid)
     .filter((repoDid) => !repoDids.has(repoDid));
+  return deleteSyncedRepos(spaceUri, staleRepoDids);
+}
+
+/** Delete the local copies of repos in a space. Returns whether any were synced. */
+export async function deleteSyncedRepos(
+  spaceUri: string,
+  staleRepoDids: string[],
+): Promise<boolean> {
   if (staleRepoDids.length === 0) return false;
+  const db = getQueryDb();
+  const existing = await db
+    .selectFrom("syncRepo")
+    .select("repoDid")
+    .where("spaceUri", "=", spaceUri)
+    .where("repoDid", "in", staleRepoDids)
+    .execute();
 
   const dereferenced = await db.transaction().execute(async (trx) => {
     const cids: string[] = [];
@@ -369,7 +392,7 @@ export async function deleteSyncedReposExcept(
     return cids;
   });
   await deleteUnreferencedBlobFiles(db, dereferenced);
-  return true;
+  return existing.length > 0;
 }
 
 export async function replaceRepoRecords(input: {

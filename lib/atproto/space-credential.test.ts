@@ -5,15 +5,13 @@ import { LexError } from "@atproto/lex-data";
 import { P256Keypair } from "@atproto/crypto";
 import { asStringFormat } from "@atproto/lex-schema";
 import {
-  COMMIT_MAC_TYPE,
-  MAC_HEADER,
+  COMMIT_MAC_PROFILE,
   RepoCommit,
   SpaceMacError,
-  WANT_MAC_HEADER,
-  computeCommitMac,
+  SpaceRepoVerificationError,
+  createCommitMacHeaders,
   decapsulate,
-  formatMacHeader,
-  parseWantMacHeader,
+  parseMacRequest,
   verifyCommit,
   verifyCredentialSig,
 } from "@atproto/space";
@@ -22,7 +20,7 @@ import { getIdResolver } from "./identity";
 import { exchangeSpaceCredential, SpaceCredential } from "./space-credential";
 
 const AUTHORITY_PDS = "https://authority.example";
-const EXCHANGE_URL = `${AUTHORITY_PDS}/xrpc/com.atproto.space.getSpaceCredential`;
+const EXCHANGE_URL = `${AUTHORITY_PDS}/xrpc/com.atproto.space.authorizeSpaceSync`;
 const SPACE = "at://did:plc:owner/space/my.bulletin.board/self";
 const DELEGATION_TOKEN = "delegation-token";
 
@@ -43,7 +41,7 @@ test("credential requests carry the delegation token and binding key in an unsig
       assert.equal(request.redirect, "error");
       assert.deepEqual(await request.json(), {
         space: SPACE,
-        credentialKid: key.did(),
+        credentialKey: key.did(),
         delegationToken: DELEGATION_TOKEN,
       });
 
@@ -58,7 +56,41 @@ test("credential requests carry the delegation token and binding key in an unsig
   });
 
   assert.equal(requestSeen, true);
-  assert.equal(credential, "space-credential");
+  assert.deepEqual(credential, {
+    credential: "space-credential",
+    spaceRev: undefined,
+  });
+});
+
+test("authorizations carry the notify registration and return the space revision", async () => {
+  const key = await P256Keypair.create();
+  const notify = { endpoint: "https://bulletin.test", token: "notify-token" };
+
+  const authorized = await exchangeSpaceCredential({
+    authorityPds: AUTHORITY_PDS,
+    delegationToken: DELEGATION_TOKEN,
+    space: SPACE,
+    key,
+    notify,
+    fetchImpl: async (input) => {
+      const request = input instanceof Request ? input : new Request(input);
+      assert.deepEqual(await request.json(), {
+        space: SPACE,
+        credentialKey: key.did(),
+        delegationToken: DELEGATION_TOKEN,
+        notify,
+      });
+      return Response.json({
+        credential: "space-credential",
+        spaceRev: "3m22222222222",
+      });
+    },
+  });
+
+  assert.deepEqual(authorized, {
+    credential: "space-credential",
+    spaceRev: "3m22222222222",
+  });
 });
 
 test("credential exchange preserves structured XRPC errors", async () => {
@@ -92,7 +124,7 @@ test("credential reads sign each repo audience, including accounts sharing a PDS
   const credential = new SpaceCredential(token, key, async (input) => {
     const request = input instanceof Request ? input : new Request(input);
     const url = new URL(request.url);
-    const audience = url.pathname.endsWith("listRepos")
+    const audience = url.pathname.endsWith("listWriters")
       ? "did:plc:owner"
       : url.searchParams.get("repo");
     assert.ok(audience);
@@ -106,7 +138,7 @@ test("credential reads sign each repo audience, including accounts sharing a PDS
     assert.equal(request.headers.get("dpop"), null);
     assert.equal(
       request.headers.get("signature-input"),
-      'atproto-space-credential=("authorization" "atproto-space-audience");tag="atproto-space-credential"',
+      'sig=("authorization" "atproto-space-audience");tag="atproto-space-credential"',
     );
     const headers = Object.fromEntries(request.headers);
     const keyId = asStringFormat(key.did(), "did");
@@ -117,8 +149,18 @@ test("credential reads sign each repo audience, including accounts sharing a PDS
         keyId,
       ),
     );
+    // listRepoOps returns the repo's commit on every page.
+    const commit = {
+      ver: 1,
+      repo: audience,
+      space: SPACE,
+      rev: "3m22222222222",
+      data: { $bytes: "AA==" },
+    };
     return Response.json(
-      url.pathname.endsWith("listRepos") ? { repos: [] } : { ops: [] },
+      url.pathname.endsWith("listWriters")
+        ? { repos: [] }
+        : { ops: [], commit },
     );
   });
 
@@ -133,7 +175,7 @@ test("credential reads sign each repo audience, including accounts sharing a PDS
   }
   await credential
     .client(service, "did:plc:owner")
-    .call(com.atproto.space.listRepos, { space: SPACE });
+    .call(com.atproto.space.listWriters, { space: SPACE });
   assert.deepEqual(seen, [
     "did:plc:writer",
     "did:plc:writer",
@@ -173,32 +215,46 @@ test("commit MAC requests use a fresh key share against the author's KEM key", a
   const first = await credential.requestCommitMac(repo);
   const retry = await credential.requestCommitMac(repo, true);
   assert.deepEqual(refreshes, [false, true]);
-  const keyShare = parseWantMacHeader(
-    first.headers[WANT_MAC_HEADER],
-    COMMIT_MAC_TYPE,
+  const request = parseMacRequest(
+    first.headers["accept-signature"],
+    COMMIT_MAC_PROFILE,
   );
+  assert.ok(request);
   assert.notEqual(
-    keyShare,
-    parseWantMacHeader(retry.headers[WANT_MAC_HEADER], COMMIT_MAC_TYPE),
+    request.keyShare,
+    parseMacRequest(retry.headers["accept-signature"], COMMIT_MAC_PROFILE)
+      ?.keyShare,
   );
 
   // Repo host side: MAC the commit with the secret from the first key share.
-  const commit = new RepoCommit().toCommit({ space, repo, rev: "3m22222222222" });
-  const mac = computeCommitMac(decapsulate(kem, keyShare), commit);
-  const response = new Headers({
-    [MAC_HEADER]: formatMacHeader(COMMIT_MAC_TYPE, mac),
+  const commit = new RepoCommit().toCommit({
+    space,
+    repo,
+    rev: asStringFormat("3m22222222222", "tid"),
   });
-  assert.equal(verifyCommit(commit, { space, repo, ...first.params(response) }), true);
-  assert.equal(verifyCommit(commit, { space, repo, ...retry.params(response) }), false);
-  assert.equal(
-    verifyCommit(commit, {
-      space,
-      repo: asStringFormat("did:plc:other", "did"),
-      ...first.params(response),
-    }),
-    false,
+  const { headers } = createCommitMacHeaders(commit, {
+    ...request,
+    sharedSecret: decapsulate(kem, request.keyShare),
+  });
+  const response = new Headers(headers);
+  verifyCommit(commit, { space, repo, ...first.params(response) });
+  assert.throws(
+    () => verifyCommit(commit, { space, repo, ...retry.params(response) }),
+    SpaceMacError,
   );
-  assert.throws(() => first.params(new Headers()), SpaceMacError);
+  assert.throws(
+    () =>
+      verifyCommit(commit, {
+        space,
+        repo: asStringFormat("did:plc:other", "did"),
+        ...first.params(response),
+      }),
+    SpaceRepoVerificationError,
+  );
+  assert.throws(
+    () => verifyCommit(commit, { space, repo, ...first.params(new Headers()) }),
+    SpaceMacError,
+  );
 });
 
 test("refresh follows the credential's actual expiry, with a five-second lead", async () => {

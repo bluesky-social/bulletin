@@ -18,12 +18,14 @@ test("local and dev envs configure distinct behavior", async () => {
   assert.equal(local.publishLexicons, true);
   assert.equal(local.databasePath, "bulletin.db");
   assert.equal(local.bskyUrl, "https://api.bsky.app");
+  assert.equal(local.syncNotifyEndpoint, "http://localhost:3000");
 
   assert.equal(dev.development, true);
   assert.equal(dev.publishLexicons, false);
   assert.equal(dev.databasePath, "bulletin-dev.db");
   assert.equal(dev.syncPollInterval, 10000);
   assert.equal(dev.managingAppService, "did:web:bulletin.my#bulletin");
+  assert.equal(dev.syncNotifyEndpoint, undefined);
   assert.equal(dev.bskyUrl, "https://api.bsky.app");
 
 });
@@ -36,6 +38,7 @@ test("config validation rejects invalid values", async () => {
     readConfig({ ...dev, SYNC_POLL_INTERVAL_MS: "999" }),
   );
   assert.throws(() => readConfig({ ...dev, PUBLISH_LEXICONS: "yes" }));
+  assert.throws(() => readConfig({ ...dev, SYNC_NOTIFICATIONS: "no" }));
   assert.throws(() =>
     readConfig({ ...dev, SYNC_INTERNAL_URL: "http://0.0.0.0:3001" }),
   );

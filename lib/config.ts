@@ -17,6 +17,8 @@ export type Config = {
   hostname: string;
   port: number;
   syncPollInterval?: number;
+  /** Base URL registered for notifySpaceUpdate. Unset when notifications are off. */
+  syncNotifyEndpoint?: string;
   managingAppPublicUrl: string;
   uiPublicUrl: string;
   syncInternalUrl: string;
@@ -66,6 +68,14 @@ export function readConfig(
       "SYNC_POLL_INTERVAL_MS",
       1000,
     ),
+    // The space host must reach this URL, so turn notifications off when this
+    // instance does not serve it (e.g. a local UI against production).
+    syncNotifyEndpoint: boolean(
+      environment.SYNC_NOTIFICATIONS ?? "true",
+      "SYNC_NOTIFICATIONS",
+    )
+      ? managingAppPublicUrl
+      : undefined,
     managingAppPublicUrl,
     uiPublicUrl: absoluteUrl(
       "UI_PUBLIC_URL",

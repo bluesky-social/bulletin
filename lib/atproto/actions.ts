@@ -38,8 +38,8 @@ export async function createBoard(session: OAuthSession): Promise<string> {
       managingApp: getConfig().managingAppService,
     }),
   });
-  await saveBoard(result.uri, session.did);
-  return result.uri;
+  await saveBoard(result.space, session.did);
+  return result.space;
 }
 
 export async function createPost(

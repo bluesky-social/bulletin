@@ -28,10 +28,10 @@ test("recognizes a missing space", () => {
 });
 
 test("recognizes user-scoped space access denial", () => {
-  assert.equal(isSpaceAccessDeniedError(new LexError("UserNotAuthorized")), true);
+  assert.equal(isSpaceAccessDeniedError(new LexError("AccountNotAuthorized")), true);
   assert.equal(isSpaceAccessDeniedError(new LexError("NotAuthorized")), true);
   assert.equal(isSpaceAccessDeniedError(new LexError("AppNotAuthorized")), false);
-  assert.equal(isSpaceAccessDeniedError(new Error("UserNotAuthorized")), false);
+  assert.equal(isSpaceAccessDeniedError(new Error("AccountNotAuthorized")), false);
 });
 
 test("treats durable deletions and invalidated watches as absent boards", () => {

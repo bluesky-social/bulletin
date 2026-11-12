@@ -4,24 +4,25 @@ import { asStringFormat } from "@atproto/lex-schema";
 import { P256Keypair } from "@atproto/crypto";
 import type { OAuthSession } from "@atproto/oauth-client-node";
 import {
-  COMMIT_MAC_TYPE,
-  MAC_HEADER,
-  WANT_MAC_HEADER,
+  COMMIT_MAC_PROFILE,
   createSpaceSigHeaders,
   encapsulate,
-  formatWantMacHeader,
-  parseMacHeader,
+  formatMacRequest,
   parseSpaceToken,
+  type VerifyMacParams,
 } from "@atproto/space";
 import { com } from "../lexicons";
 import { resolveKemKey, resolvePds } from "./identity";
 
-const GET_SPACE_CREDENTIAL_PATH = "/xrpc/com.atproto.space.getSpaceCredential";
+const AUTHORIZE_SPACE_SYNC_PATH = "/xrpc/com.atproto.space.authorizeSpaceSync";
+
+/** Where the space host sends notifySpaceUpdate, registered by authorizeSpaceSync. */
+export type NotifyRegistration = { endpoint: string; token: string };
 
 export type CommitMacRequest = {
   headers: Record<string, string>;
-  /** The shared secret and the MAC the response carried, for `verifyCommit`. */
-  params: (headers: Headers) => { sharedSecret: Uint8Array; mac: Uint8Array };
+  /** The key share, shared secret, and response headers, for `verifyCommit`. */
+  params: (headers: Headers) => VerifyMacParams;
 };
 
 export class SpaceCredential {
@@ -31,12 +32,20 @@ export class SpaceCredential {
     readonly token: string,
     readonly key: P256Keypair,
     private readonly fetchImpl: typeof fetch = fetch,
+    /** From authorizeSpaceSync: the space revision, and the notify token it renewed. */
+    readonly authorization: { spaceRev?: string; notifyToken?: string } = {},
   ) {}
 
   needsRefresh(now = Date.now()): boolean {
     if (this.invalidated) return true;
     const { exp } = parseSpaceToken("credential", this.token).payload;
     return !Number.isFinite(exp) || now + 5_000 >= exp * 1000;
+  }
+
+  /** When the credential, and any registration it renewed, expires. */
+  get expiresAt(): string {
+    const { exp } = parseSpaceToken("credential", this.token).payload;
+    return new Date(exp * 1000).toISOString();
   }
 
   fetch = async (
@@ -48,9 +57,10 @@ export class SpaceCredential {
       throw new LexError("JwtExpired", "Refresh the space credential");
     }
     const request = new Request(input, { ...init, redirect: "error" });
-    const headers = await createSpaceSigHeaders(this.key, {
+    const { headers } = await createSpaceSigHeaders({
       authorization: `Atproto-Space-Credential ${this.token}`,
       audience: asStringFormat(audience, "did"),
+      keypair: this.key,
     });
     for (const [name, value] of Object.entries(headers)) {
       request.headers.set(name, value);
@@ -85,16 +95,13 @@ export class SpaceCredential {
     refreshKey = false,
   ): Promise<CommitMacRequest> {
     const { keyShare, sharedSecret } = await encapsulate(
-      await resolveKemKey(repo, refreshKey),
+      asStringFormat(await resolveKemKey(repo, refreshKey), "did"),
     );
     return {
       headers: {
-        [WANT_MAC_HEADER]: formatWantMacHeader(COMMIT_MAC_TYPE, keyShare),
+        "accept-signature": formatMacRequest(COMMIT_MAC_PROFILE, keyShare),
       },
-      params: (headers) => ({
-        sharedSecret,
-        mac: parseMacHeader(headers.get(MAC_HEADER) ?? undefined, COMMIT_MAC_TYPE),
-      }),
+      params: (headers) => ({ keyShare, sharedSecret, headers }),
     };
   }
 }
@@ -102,6 +109,7 @@ export class SpaceCredential {
 export async function mintSpaceCredential(
   session: OAuthSession,
   space: string,
+  notify?: NotifyRegistration,
 ): Promise<SpaceCredential> {
   const viewerClient = new Client(session);
   const delegation = await viewerClient.call(
@@ -112,13 +120,17 @@ export async function mintSpaceCredential(
   if (!authority) throw new Error("Invalid space URI");
   const authorityPds = await resolvePds(authority);
   const key = await P256Keypair.create();
-  const credential = await exchangeSpaceCredential({
+  const { credential, spaceRev } = await exchangeSpaceCredential({
     authorityPds,
     delegationToken: delegation.token,
     space,
     key,
+    notify,
   });
-  return new SpaceCredential(credential, key);
+  return new SpaceCredential(credential, key, fetch, {
+    spaceRev,
+    notifyToken: notify?.token,
+  });
 }
 
 export async function exchangeSpaceCredential(input: {
@@ -126,9 +138,10 @@ export async function exchangeSpaceCredential(input: {
   delegationToken: string;
   space: string;
   key: P256Keypair;
+  notify?: NotifyRegistration;
   fetchImpl?: typeof fetch;
-}): Promise<string> {
-  const url = new URL(GET_SPACE_CREDENTIAL_PATH, input.authorityPds);
+}): Promise<{ credential: string; spaceRev?: string }> {
+  const url = new URL(AUTHORIZE_SPACE_SYNC_PATH, input.authorityPds);
   const request = new Request(url, {
     method: "POST",
     redirect: "error",
@@ -138,8 +151,9 @@ export async function exchangeSpaceCredential(input: {
     },
     body: JSON.stringify({
       space: input.space,
-      credentialKid: input.key.did(),
+      credentialKey: input.key.did(),
       delegationToken: input.delegationToken,
+      ...(input.notify ? { notify: input.notify } : {}),
     }),
   });
   const response = await (input.fetchImpl ?? fetch)(request);
@@ -155,7 +169,7 @@ export async function exchangeSpaceCredential(input: {
     const message =
       typeof error?.message === "string" ? error.message : undefined;
     throw new XrpcResponseError(
-      com.atproto.space.getSpaceCredential.main,
+      com.atproto.space.authorizeSpaceSync.main,
       response,
       {
         encoding: "application/json",
@@ -171,7 +185,10 @@ export async function exchangeSpaceCredential(input: {
       "Credential exchange returned no credential",
     );
   }
-  return output.credential;
+  return {
+    credential: output.credential,
+    spaceRev: typeof output.spaceRev === "string" ? output.spaceRev : undefined,
+  };
 }
 
 async function readJson(response: Response): Promise<unknown> {

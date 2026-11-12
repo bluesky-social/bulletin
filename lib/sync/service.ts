@@ -3,14 +3,11 @@ import { fromBase64 } from "@atproto/lex-data";
 import { SyncEngine } from "./engine";
 import { isBoardAbsentError } from "./errors";
 import { com } from "../lexicons";
-import {
-  verifySpaceDeletionNotification,
-  verifySyncNotification,
-} from "./service-auth";
 
 export type SyncServiceOptions = {
   internalUrl: string;
-  managingAppService: string;
+  /** Public base URL the space host calls notifySpaceUpdate on, if enabled. */
+  notifyEndpoint?: string;
   pollInterval?: number;
 };
 
@@ -31,7 +28,7 @@ export class SyncService {
     this.#options = options;
     this.#engine = new SyncEngine(
       (space) => this.#broadcast(space),
-      options.managingAppService,
+      options.notifyEndpoint,
     );
   }
 
@@ -59,8 +56,15 @@ export class SyncService {
       );
       this.#reconcileTimer.unref();
     }
-    this.#resume();
     console.log(`Bulletin internal sync service ${this.#options.internalUrl}`);
+  }
+
+  /**
+   * Resume syncing watched boards. Call once the public web service is up: a new
+   * notify registration is confirmed by the space host calling back through it.
+   */
+  resume(): void {
+    this.#resume();
   }
 
   close(): Promise<void> {
@@ -129,39 +133,53 @@ export class SyncService {
         }
         return json(response, 200, { ok: true });
       }
+      // The space host calls these without service auth. The token in the body
+      // authenticates them, and must be the one registered for the space.
       if (
         request.method === "POST" &&
-        url.pathname === "/xrpc/com.atproto.space.notifyWrite"
+        url.pathname === "/xrpc/com.atproto.space.confirmRegistration"
       ) {
         const body = await readJson(request);
-        const notification = parseWriteNotification(body);
-        if (!notification) {
-          return json(response, 400, { error: "Invalid notification" });
+        const parsed =
+          com.atproto.space.confirmRegistration.$input.schema.safeParse(body);
+        if (!parsed.success) {
+          return json(response, 400, { error: "InvalidRequest" });
         }
-        const authorization = Array.isArray(request.headers.authorization)
-          ? request.headers.authorization[0]
-          : request.headers.authorization;
-        await verifySyncNotification(authorization, notification.space);
-        json(response, 200, {});
-        void this.#engine
-          .notify(notification)
-          .catch((error) => console.error("notification sync failed", error));
-        return;
+        const { space, token, challenge } = parsed.value;
+        if (!(await this.#engine.isNotifyToken(space, token))) {
+          return json(response, 400, {
+            error: "InvalidRequest",
+            message: "Unknown registration",
+          });
+        }
+        return json(response, 200, { challenge });
       }
       if (
         request.method === "POST" &&
-        url.pathname === "/xrpc/com.atproto.space.notifySpaceDeleted"
+        url.pathname === "/xrpc/com.atproto.space.notifySpaceUpdate"
       ) {
         const body = await readJson(request);
-        if (typeof body.space !== "string") {
-          return json(response, 400, { error: "Invalid notification" });
+        const notification = parseSpaceUpdate(body);
+        if (!notification) {
+          return json(response, 400, { error: "InvalidRequest" });
         }
-        const authorization = Array.isArray(request.headers.authorization)
-          ? request.headers.authorization[0]
-          : request.headers.authorization;
-        await verifySpaceDeletionNotification(authorization, body.space);
-        await this.#engine.deleteSpace(body.space, { waitForRemoval: true });
-        return json(response, 200, {});
+        const { space, token, update } = notification;
+        // Rejecting with a 400 also unregisters a watch that has been dropped.
+        if (!(await this.#engine.isNotifyToken(space, token))) {
+          return json(response, 400, {
+            error: "InvalidRequest",
+            message: "Unknown registration",
+          });
+        }
+        const spaceRev = repoUpdateRev(update);
+        const task = spaceRev
+          ? this.#engine.notify({ space, spaceRev })
+          : this.#engine.reauthorize(space);
+        json(response, 200, {});
+        void task.catch((error) =>
+          console.error("notification sync failed", error),
+        );
+        return;
       }
       return json(response, 404, { error: "Not found" });
     } catch (error) {
@@ -193,19 +211,35 @@ export class SyncService {
   }
 }
 
-export function parseWriteNotification(body: Record<string, unknown>) {
+type SpaceUpdate = com.atproto.space.notifySpaceUpdate.$InputBody["update"];
+
+export function parseSpaceUpdate(body: Record<string, unknown>) {
   try {
-    const data = body.data as { $bytes?: unknown } | undefined;
-    if (!data || typeof data.$bytes !== "string") return undefined;
-    const parsed = com.atproto.space.notifyWrite.$input.schema.safeParse({
+    const update = body.update as Record<string, unknown> | undefined;
+    const data = update?.data as { $bytes?: unknown } | undefined;
+    const parsed = com.atproto.space.notifySpaceUpdate.$input.schema.safeParse({
       ...body,
-      data: fromBase64(data.$bytes),
+      update:
+        data && typeof data.$bytes === "string"
+          ? { ...update, data: fromBase64(data.$bytes) }
+          : update,
     });
-    if (!parsed.success || !parsed.value.spaceRev) return undefined;
-    return { ...parsed.value, spaceRev: parsed.value.spaceRev };
+    return parsed.success ? parsed.value : undefined;
   } catch {
     return undefined;
   }
+}
+
+/**
+ * The space revision of a repoWrite or repoRemoved update. Anything else, a
+ * spaceDeleted or registrationExpired notice, calls for reauthorizing.
+ */
+export function repoUpdateRev(update: SpaceUpdate): string | undefined {
+  const { repoWrite, repoRemoved } = com.atproto.space.defs;
+  if (update.$type === repoWrite.$type || update.$type === repoRemoved.$type) {
+    return (update as { spaceRev: string }).spaceRev;
+  }
+  return undefined;
 }
 
 async function readJson(

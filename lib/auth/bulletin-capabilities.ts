@@ -26,20 +26,17 @@ export function bulletinCapabilitiesFromScope(
   ownerDid: string,
 ): BulletinCapabilities {
   const permissions = new ScopePermissions(scope);
+  const board = (did: string) => ({
+    spaceDid: asStringFormat(did, "did"),
+    spaceType: asStringFormat(SPACE_TYPE, "nsid"),
+    skey: asStringFormat(BOARD_SKEY, "record-key"),
+  });
   return {
     canCreateBoard:
       viewerDid === ownerDid &&
-      permissions.allowsSpace({
-        type: SPACE_TYPE,
-        authority: asStringFormat(viewerDid, "did"),
-        skey: BOARD_SKEY,
-        manage: "create",
-      }),
-    canCreateNote: permissions.allowsSpace({
-      type: SPACE_TYPE,
-      authority: asStringFormat(ownerDid, "did"),
-      skey: BOARD_SKEY,
-      collection: POST_COLLECTION,
+      permissions.allowsSpace(board(viewerDid), { manage: "create" }),
+    canCreateNote: permissions.allowsSpace(board(ownerDid), {
+      collection: asStringFormat(POST_COLLECTION, "nsid"),
       action: "create",
     }),
   };

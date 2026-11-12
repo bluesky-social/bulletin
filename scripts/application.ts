@@ -76,7 +76,7 @@ export class BulletinApplication {
     this.#publishLexicons = config.publishLexicons;
     this.#sync = new SyncService({
       internalUrl: config.syncInternalUrl,
-      managingAppService: config.managingAppService,
+      notifyEndpoint: config.syncNotifyEndpoint,
       pollInterval: config.syncPollInterval,
     });
     this.#web = new WebService(config);
@@ -89,6 +89,7 @@ export class BulletinApplication {
     try {
       await this.#sync.start();
       await this.#web.start();
+      this.#sync.resume();
     } catch (error) {
       await this.close().catch(() => undefined);
       throw error;

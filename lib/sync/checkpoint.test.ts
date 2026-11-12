@@ -5,11 +5,12 @@ import { LexError } from "@atproto/lex-data";
 import type { SpaceCredential } from "../atproto/space-credential";
 import { com } from "../lexicons";
 import { SyncEngine } from "./engine";
-import { parseWriteNotification } from "./service";
+import { parseSpaceUpdate, repoUpdateRev } from "./service";
 
 process.env.DATABASE_PATH = ":memory:";
 const { migrate } = await import("../db/migrations");
 const {
+  applySyncedChanges,
   getSyncedRepo,
   listSpaceWatches,
   saveAccount,
@@ -21,13 +22,23 @@ await migrate();
 
 const rev = (n: number) => asStringFormat(`3m2222222222${n}`, "tid");
 const writer = "did:plc:writer";
+const NOTIFY_ENDPOINT = "https://bulletin.test";
 const entry = (n: number, did = writer) => ({
-  did: asStringFormat(did, "did"),
+  $type: "com.atproto.space.defs#repoWrite" as const,
+  repo: asStringFormat(did, "did"),
   repoRev: rev(n),
   spaceRev: rev(n),
   data: new Uint8Array([n]),
 });
-type Page = { repos: ReturnType<typeof entry>[]; cursor?: string };
+const removed = (n: number, did = writer) => ({
+  $type: "com.atproto.space.defs#repoRemoved" as const,
+  repo: asStringFormat(did, "did"),
+  spaceRev: rev(n),
+});
+type Page = {
+  repos: (ReturnType<typeof entry> | ReturnType<typeof removed>)[];
+  cursor?: string;
+};
 
 async function fixture(
   name: string,
@@ -37,19 +48,20 @@ async function fixture(
   const authorityDid = `did:plc:${name}`;
   const space = `at://${authorityDid}/space/my.bulletin.board/self`;
   await saveAccount({ did: authorityDid, pdsUrl: "https://authority.test" });
-  await saveSpaceWatch({ spaceUri: space, authorityDid });
+  const token = await saveSpaceWatch({ spaceUri: space, authorityDid });
   await updateSpaceWatch({
     spaceUri: space,
     spaceRev: initial,
     registrationExpiresAt: new Date(Date.now() + 86_400_000).toISOString(),
   });
-  const engine = new SyncEngine(() => {}, "did:web:bulletin.test#bulletin");
+  const engine = new SyncEngine(() => {}, NOTIFY_ENDPOINT);
   const credential = {
+    authorization: {},
     client: (_service: string, audience: string) => {
       assert.equal(audience, authorityDid);
       return {
         call: async (method: unknown, params: { cursor?: string }) => {
-          assert.equal(method, com.atproto.space.listRepos);
+          assert.equal(method, com.atproto.space.listWriters);
           return list(params.cursor);
         },
       };
@@ -68,17 +80,10 @@ async function fixture(
       commitHash: new Uint8Array([2]),
     });
   };
-  const notify = (n: number, previous = n - 1) =>
-    engine.notify({
-      space,
-      repo: writer,
-      repoRev: rev(n),
-      spaceRev: rev(n),
-      prevSpaceRev: rev(previous),
-    });
+  const notify = (n: number) => engine.notify({ space, spaceRev: rev(n) });
   const checkpoint = async () =>
     (await listSpaceWatches()).find((w) => w.spaceUri === space)!.spaceRev;
-  return { engine, space, notify, checkpoint, synced };
+  return { engine, space, token, credential, notify, checkpoint, synced };
 }
 
 test("notification gaps catch up from the checkpoint, through short and empty pages", async (t) => {
@@ -131,16 +136,11 @@ test("failed work leaves the durable checkpoint for the next engine to replay", 
   assert.equal(await f.checkpoint(), rev(2));
   f.engine.stop();
 
-  const restarted = new SyncEngine(() => {}, "did:web:bulletin.test#bulletin");
+  const restarted = new SyncEngine(() => {}, NOTIFY_ENDPOINT);
   t.after(() => restarted.stop());
   restarted["credentialFor"] = f.engine["credentialFor"];
   restarted["syncRepoWithCredential"] = sync;
-  await restarted.notify({
-    space: f.space,
-    repo: writer,
-    repoRev: rev(4),
-    spaceRev: rev(4),
-  });
+  await restarted.notify({ space: f.space, spaceRev: rev(4) });
   assert.equal(await f.checkpoint(), rev(4));
 });
 
@@ -211,25 +211,151 @@ test("repo recovery does not retry a revoked credential", async (t) => {
   assert.equal(recovered, false);
 });
 
-test("forwarded notifications require the new revision fields and decode Lexicon bytes", () => {
+test("a removal drops the repo's local copy, and full listings leave it out", async (t) => {
+  const f = await fixture("removal", async (cursor) => {
+    if (cursor === rev(2)) return { repos: [removed(3)], cursor: rev(3) };
+    if (cursor === undefined) {
+      return { repos: [removed(3), entry(4, "did:plc:other")], cursor: rev(4) };
+    }
+    return { repos: [] };
+  });
+  t.after(() => f.engine.stop());
+  await saveSyncedRepo({
+    spaceUri: f.space,
+    repoDid: writer,
+    pdsUrl: "https://repo.test",
+    rev: rev(2),
+    ltHash: new Uint8Array([1]),
+    commitHash: new Uint8Array([2]),
+  });
+  const postUri = `${f.space}/${writer}/my.bulletin.post/post`;
+  await applySyncedChanges([
+    {
+      kind: "post",
+      value: {
+        uri: postUri,
+        cid: "bafyreipost",
+        spaceUri: f.space,
+        authorDid: writer,
+        text: "hello",
+        createdAt: "2026-11-12T12:00:00.000Z",
+      },
+    },
+  ]);
+
+  await f.notify(3);
+  assert.equal(await getSyncedRepo(f.space, writer), null);
+  assert.equal(await f.checkpoint(), rev(3));
+
+  // A full inventory keeps listing the removed repo, but must not resync it.
+  const watch = (await listSpaceWatches()).find((w) => w.spaceUri === f.space)!;
+  f.engine["bindWatch"](watch);
+  await f.engine["runReconcile"](watch);
+  assert.deepEqual(f.synced, ["did:plc:other"]);
+  assert.equal(await getSyncedRepo(f.space, writer), null);
+  assert.ok(await getSyncedRepo(f.space, "did:plc:other"));
+});
+
+test("only the token registered for a space authenticates its notifications", async (t) => {
+  const f = await fixture("token", async () => ({ repos: [] }));
+  t.after(() => f.engine.stop());
+  assert.ok(f.token);
+  assert.equal(await f.engine.isNotifyToken(f.space, f.token), true);
+  assert.equal(await f.engine.isNotifyToken(f.space, "x".repeat(64)), false);
+  assert.equal(
+    await f.engine.isNotifyToken(
+      "at://did:plc:elsewhere/space/my.bulletin.board/self",
+      f.token,
+    ),
+    false,
+  );
+  // Without a notify endpoint, nothing was registered.
+  const disabled = new SyncEngine(() => {});
+  t.after(() => disabled.stop());
+  assert.equal(await disabled.isNotifyToken(f.space, f.token), false);
+});
+
+test("an expiry notice reauthorizes, then catches up past the checkpoint", async (t) => {
+  const events: (string | undefined)[] = [];
+  const f = await fixture("expired", async (cursor) => {
+    events.push(cursor);
+    return cursor === rev(2)
+      ? { repos: [entry(4)], cursor: rev(4) }
+      : { repos: [] };
+  });
+  t.after(() => f.engine.stop());
+  f.engine["credentialFor"] = async () => {
+    events.push("authorize");
+    return Object.assign(Object.create(f.credential), {
+      authorization: { spaceRev: rev(4), notifyToken: f.token },
+      expiresAt: new Date(Date.now() + 600_000).toISOString(),
+    });
+  };
+  await f.engine.reauthorize(f.space);
+  assert.equal(events[0], "authorize");
+  assert.deepEqual(
+    events.filter((event) => event !== "authorize"),
+    [rev(2), rev(4)],
+  );
+  assert.equal(await f.checkpoint(), rev(4));
+  assert.ok(f.engine["maintenanceTimers"].has(f.space));
+});
+
+test("a deletion notice drops the space only once reauthorizing confirms it", async (t) => {
+  const f = await fixture("deleted", async () => ({ repos: [] }));
+  t.after(() => f.engine.stop());
+  f.engine["credentialFor"] = async () => {
+    throw new LexError("SpaceDeleted");
+  };
+  await f.engine.reauthorize(f.space);
+  await f.engine["removals"].get(f.space);
+  assert.equal(
+    (await listSpaceWatches()).some((w) => w.spaceUri === f.space),
+    false,
+  );
+});
+
+test("space updates decode Lexicon bytes and match update types in full", () => {
   const body = {
     space: "at://did:plc:owner/space/my.bulletin.board/self",
-    repo: writer,
-    repoRev: rev(3),
-    spaceRev: rev(4),
-    data: { $bytes: "AQI=" },
+    token: "notify-token",
+    update: {
+      $type: "com.atproto.space.defs#repoWrite",
+      repo: writer,
+      repoRev: rev(3),
+      spaceRev: rev(4),
+      data: { $bytes: "AQI=" },
+    },
   };
-  assert.deepEqual(parseWriteNotification(body)?.data, new Uint8Array([1, 2]));
-  assert.equal(
-    parseWriteNotification({ ...body, spaceRev: undefined }),
-    undefined,
+  const parsed = parseSpaceUpdate(body);
+  assert.deepEqual(
+    (parsed?.update as { data?: Uint8Array }).data,
+    new Uint8Array([1, 2]),
   );
+  assert.equal(repoUpdateRev(parsed!.update), rev(4));
+  const removal = parseSpaceUpdate({
+    ...body,
+    update: {
+      $type: "com.atproto.space.defs#repoRemoved",
+      repo: writer,
+      spaceRev: rev(5),
+    },
+  });
+  assert.equal(repoUpdateRev(removal!.update), rev(5));
+  for (const update of [
+    { $type: "com.atproto.space.notifySpaceUpdate#spaceDeleted" },
+    {
+      $type: "com.atproto.space.notifySpaceUpdate#registrationExpired",
+      spaceRev: rev(5),
+    },
+  ]) {
+    const notice = parseSpaceUpdate({ ...body, update });
+    assert.ok(notice);
+    assert.equal(repoUpdateRev(notice.update), undefined);
+  }
+  assert.equal(parseSpaceUpdate({ ...body, token: undefined }), undefined);
   assert.equal(
-    parseWriteNotification({ ...body, repoRev: undefined, rev: rev(3) }),
-    undefined,
-  );
-  assert.equal(
-    parseWriteNotification({ ...body, prevSpaceRev: "not-a-tid" }),
+    parseSpaceUpdate({ ...body, update: { ...body.update, repoRev: "nope" } }),
     undefined,
   );
 });

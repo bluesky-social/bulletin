@@ -12,7 +12,7 @@ test("a minted credential proves the space exists", async () => {
 });
 
 test("an authorization denial still proves the space exists", async () => {
-  for (const error of ["UserNotAuthorized", "NotAuthorized"] as const) {
+  for (const error of ["AccountNotAuthorized", "NotAuthorized"] as const) {
     assert.equal(
       await probeSpaceExists(session, space, async () => {
         throw new LexError(error);

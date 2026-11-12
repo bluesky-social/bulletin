@@ -5,7 +5,7 @@
     "main": {
       "type": "space",
       "key": "literal:self",
-      "name": "Bulletin Board",
+      "title": "Bulletin Board",
       "description": "A personal board where followers can read and post notes.",
       "collections": [
         "my.bulletin.post",

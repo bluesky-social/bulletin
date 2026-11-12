@@ -7,15 +7,9 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   const space = request.nextUrl.searchParams.get("space");
-  const user = request.nextUrl.searchParams.get("user");
-  const access = request.nextUrl.searchParams.get("access");
+  const repo = request.nextUrl.searchParams.get("repo");
   const authority = space?.match(/^at:\/\/(did:[^/]+)\/space\//)?.[1];
-  if (
-    !space ||
-    !user ||
-    !authority ||
-    (access !== "read" && access !== "write")
-  ) {
+  if (!space || !authority || (repo !== null && !repo.startsWith("did:"))) {
     return NextResponse.json({ error: "InvalidRequest" }, { status: 400 });
   }
 
@@ -24,9 +18,13 @@ export async function GET(request: NextRequest) {
       request.headers.get("authorization"),
       authority,
     );
-    const relationship = await getRelationship(user, authority);
+    // Without a repo the request has no delegation token. Boards are only
+    // readable by followers, so anonymous access is always denied.
+    if (!repo) return NextResponse.json({ read: false, write: false });
+    const relationship = await getRelationship(repo, authority);
     return NextResponse.json({
-      authorized: isBoardAccessAuthorized(relationship, access),
+      read: isBoardAccessAuthorized(relationship, "read"),
+      write: isBoardAccessAuthorized(relationship, "write"),
     });
   } catch (error) {
     console.error("managing-app access check failed", error);
