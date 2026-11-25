@@ -32,7 +32,7 @@ test("account and board queries return typed application rows", async () => {
     pdsUrl: "https://pds.test",
   });
   await saveAccount({ did: "did:plc:owner" });
-  await saveBoard("at://did:plc:owner/space/example.board/self", "did:plc:owner");
+  await saveBoard("at:space/did:plc:owner/example.board/self", "did:plc:owner");
 
   assert.deepEqual(await getAccount("did:plc:owner"), {
     did: "did:plc:owner",
@@ -46,7 +46,7 @@ test("account and board queries return typed application rows", async () => {
 });
 
 test("space watches can be checked without materializing a board", async () => {
-  const spaceUri = "at://did:plc:watched/space/example.board/self";
+  const spaceUri = "at:space/did:plc:watched/example.board/self";
   assert.equal(await hasSpaceWatch(spaceUri), false);
   await saveBoard(spaceUri, "did:plc:watched");
   await saveSpaceWatch({ spaceUri, authorityDid: "did:plc:watched" });
@@ -58,7 +58,7 @@ test("space watches can be checked without materializing a board", async () => {
 });
 
 test("board materialization applies owner moderation and positioning", async () => {
-  const spaceUri = "at://did:plc:owner/space/example.board/self";
+  const spaceUri = "at:space/did:plc:owner/example.board/self";
   const postUri = `${spaceUri}/did:plc:author/example.post/one`;
   const createdAt = new Date().toISOString();
   await saveAccount({ did: "did:plc:author", handle: "author.test" });
@@ -119,7 +119,7 @@ test("board materialization applies owner moderation and positioning", async () 
 
 test("sync repository hashes round-trip as byte arrays", async () => {
   await saveSyncedRepo({
-    spaceUri: "at://did:plc:owner/space/example.board/self",
+    spaceUri: "at:space/did:plc:owner/example.board/self",
     repoDid: "did:plc:author",
     pdsUrl: "https://pds.test",
     rev: "1",
@@ -129,11 +129,11 @@ test("sync repository hashes round-trip as byte arrays", async () => {
 
   assert.deepEqual(
     await getSyncedRepo(
-      "at://did:plc:owner/space/example.board/self",
+      "at:space/did:plc:owner/example.board/self",
       "did:plc:author",
     ),
     {
-      spaceUri: "at://did:plc:owner/space/example.board/self",
+      spaceUri: "at:space/did:plc:owner/example.board/self",
       repoDid: "did:plc:author",
       pdsUrl: "https://pds.test",
       rev: "1",
@@ -144,7 +144,7 @@ test("sync repository hashes round-trip as byte arrays", async () => {
 });
 
 test("reconciliation removes repositories absent from the remote space", async () => {
-  const spaceUri = "at://did:plc:owner/space/example.board/recreated";
+  const spaceUri = "at:space/did:plc:owner/example.board/recreated";
   const retainedDid = "did:plc:retained";
   const staleDid = "did:plc:stale";
   for (const repoDid of [retainedDid, staleDid]) {

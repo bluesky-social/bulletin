@@ -51,7 +51,7 @@ test("deletes a blob file after its last note reference is removed", async () =>
 });
 
 function post(authorDid: string, rkey: string, cid: string) {
-  const spaceUri = `at://${authorDid}/space/my.bulletin.board/self`;
+  const spaceUri = `at:space/${authorDid}/my.bulletin.board/self`;
   const uri = `${spaceUri}/${authorDid}/my.bulletin.post/${rkey}`;
   return {
     change: {

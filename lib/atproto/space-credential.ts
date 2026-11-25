@@ -116,7 +116,7 @@ export async function mintSpaceCredential(
     com.atproto.space.getDelegationToken,
     { space: asStringFormat(space, "space-ref") },
   );
-  const authority = space.match(/^at:\/\/(did:[^/]+)\/space\//)?.[1];
+  const authority = space.match(/^at:space\/(did:[^/]+)\//)?.[1];
   if (!authority) throw new Error("Invalid space URI");
   const authorityPds = await resolvePds(authority);
   const key = await P256Keypair.create();

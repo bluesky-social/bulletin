@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 export async function GET(request: NextRequest) {
   const space = request.nextUrl.searchParams.get("space");
   const repo = request.nextUrl.searchParams.get("repo");
-  const authority = space?.match(/^at:\/\/(did:[^/]+)\/space\//)?.[1];
+  const authority = space?.match(/^at:space\/(did:[^/]+)\//)?.[1];
   if (!space || !authority || (repo !== null && !repo.startsWith("did:"))) {
     return NextResponse.json({ error: "InvalidRequest" }, { status: 400 });
   }

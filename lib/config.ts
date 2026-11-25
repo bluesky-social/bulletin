@@ -108,7 +108,7 @@ function boolean(value: string, name: string): boolean {
 }
 
 export function boardUri(ownerDid: string): string {
-  return `at://${ownerDid}/space/${SPACE_TYPE}/${BOARD_SKEY}`;
+  return `at:space/${ownerDid}/${SPACE_TYPE}/${BOARD_SKEY}`;
 }
 
 function absoluteUrl(name: string, value: string): string {

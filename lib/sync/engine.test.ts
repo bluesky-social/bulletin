@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { POST_COLLECTION, REMOVAL_COLLECTION } from "../config";
+import {
+  POSITION_COLLECTION,
+  POST_COLLECTION,
+  REMOVAL_COLLECTION,
+} from "../config";
 import { parseChange } from "./engine";
 
 test("removes a stale post when a replacement value is malformed", () => {
-  const space = "at://did:plc:owner/space/my.bulletin.board/self";
+  const space = "at:space/did:plc:owner/my.bulletin.board/self";
   const repoDid = "did:plc:writer";
   assert.deepEqual(
     parseChange({
@@ -26,7 +30,7 @@ test("removes a stale post when a replacement value is malformed", () => {
 });
 
 test("parses a board removal without generic label fields", () => {
-  const space = "at://did:plc:owner/space/my.bulletin.board/self";
+  const space = "at:space/did:plc:owner/my.bulletin.board/self";
   const repoDid = "did:plc:owner";
   const subjectUri = `${space}/did:plc:writer/${POST_COLLECTION}/post`;
   const createdAt = "2026-08-19T12:00:00.000Z";
@@ -59,7 +63,7 @@ test("parses a board removal without generic label fields", () => {
 });
 
 test("removes a stale removal when its replacement is malformed", () => {
-  const space = "at://did:plc:owner/space/my.bulletin.board/self";
+  const space = "at:space/did:plc:owner/my.bulletin.board/self";
   const repoDid = "did:plc:owner";
 
   assert.deepEqual(
@@ -78,5 +82,44 @@ test("removes a stale removal when its replacement is malformed", () => {
       spaceUri: space,
       authorDid: repoDid,
     },
+  );
+});
+
+test("indexes an alpha-era subject URI in the at:space/ form", () => {
+  const space = "at:space/did:plc:owner/my.bulletin.board/self";
+  const repoDid = "did:plc:owner";
+  const createdAt = "2026-08-19T12:00:00.000Z";
+  const subject = {
+    uri: `at://did:plc:owner/space/my.bulletin.board/self/did:plc:writer/${POST_COLLECTION}/post`,
+    cid: "bafyreipost",
+  };
+  const subjectUri = `${space}/did:plc:writer/${POST_COLLECTION}/post`;
+
+  const removal = parseChange({
+    space,
+    repoDid,
+    collection: REMOVAL_COLLECTION,
+    rkey: "removal",
+    cid: "bafyreiremoval",
+    value: { subject, createdAt },
+  });
+  assert.equal(removal?.kind, "removal");
+  assert.equal(
+    removal?.kind === "removal" ? removal.value.subjectUri : undefined,
+    subjectUri,
+  );
+
+  const position = parseChange({
+    space,
+    repoDid,
+    collection: POSITION_COLLECTION,
+    rkey: "position",
+    cid: "bafyreiposition",
+    value: { subject, position: { x: 1, y: 2 }, createdAt },
+  });
+  assert.equal(position?.kind, "position");
+  assert.equal(
+    position?.kind === "position" ? position.value.subjectUri : undefined,
+    subjectUri,
   );
 });

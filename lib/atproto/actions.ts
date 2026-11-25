@@ -253,6 +253,8 @@ export async function removePostFromBoard(
     throw new Error("Only the board owner can moderate this board");
   }
   const space = asStringFormat(boardUri(input.ownerDid), "space-ref");
+  // Strict validation keeps an `at://.../space/...` URI out of new records.
+  const postUri = asStringFormat(input.postUri, "at-uri");
   const createdAt = new Date().toISOString();
   const client = new Client(session);
   const result = await client.call(com.atproto.space.createRecord, {
@@ -262,7 +264,7 @@ export async function removePostFromBoard(
     validate: false,
     record: {
       $type: REMOVAL_COLLECTION,
-      subject: { uri: input.postUri, cid: input.postCid },
+      subject: { uri: postUri, cid: input.postCid },
       createdAt,
     },
   });
@@ -271,7 +273,7 @@ export async function removePostFromBoard(
     cid: result.cid,
     spaceUri: space,
     authorDid: session.did,
-    subjectUri: input.postUri,
+    subjectUri: postUri,
     subjectCid: input.postCid,
     createdAt,
   });

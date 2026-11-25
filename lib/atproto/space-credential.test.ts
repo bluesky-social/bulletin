@@ -21,7 +21,7 @@ import { exchangeSpaceCredential, SpaceCredential } from "./space-credential";
 
 const AUTHORITY_PDS = "https://authority.example";
 const EXCHANGE_URL = `${AUTHORITY_PDS}/xrpc/com.atproto.space.authorizeSpaceSync`;
-const SPACE = "at://did:plc:owner/space/my.bulletin.board/self";
+const SPACE = "at:space/did:plc:owner/my.bulletin.board/self";
 const DELEGATION_TOKEN = "delegation-token";
 
 test("credential requests carry the delegation token and binding key in an unsigned body", async () => {

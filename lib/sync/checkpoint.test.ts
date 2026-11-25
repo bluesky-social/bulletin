@@ -46,7 +46,7 @@ async function fixture(
   initial = rev(2),
 ) {
   const authorityDid = `did:plc:${name}`;
-  const space = `at://${authorityDid}/space/my.bulletin.board/self`;
+  const space = `at:space/${authorityDid}/my.bulletin.board/self`;
   await saveAccount({ did: authorityDid, pdsUrl: "https://authority.test" });
   const token = await saveSpaceWatch({ spaceUri: space, authorityDid });
   await updateSpaceWatch({
@@ -264,7 +264,7 @@ test("only the token registered for a space authenticates its notifications", as
   assert.equal(await f.engine.isNotifyToken(f.space, "x".repeat(64)), false);
   assert.equal(
     await f.engine.isNotifyToken(
-      "at://did:plc:elsewhere/space/my.bulletin.board/self",
+      "at:space/did:plc:elsewhere/my.bulletin.board/self",
       f.token,
     ),
     false,
@@ -317,7 +317,7 @@ test("a deletion notice drops the space only once reauthorizing confirms it", as
 
 test("space updates decode Lexicon bytes and match update types in full", () => {
   const body = {
-    space: "at://did:plc:owner/space/my.bulletin.board/self",
+    space: "at:space/did:plc:owner/my.bulletin.board/self",
     token: "notify-token",
     update: {
       $type: "com.atproto.space.defs#repoWrite",

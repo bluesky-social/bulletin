@@ -10,6 +10,23 @@ import type { DatabaseSchema } from "./schema";
 export const INITIAL_MIGRATION_NAME = "001_initial";
 export const SPACE_REV_MIGRATION_NAME = "002_space_revision";
 export const NOTIFY_TOKEN_MIGRATION_NAME = "003_notify_token";
+export const SPACE_URI_FORM_MIGRATION_NAME = "004_space_uri_form";
+
+/** Columns that hold space refs, or URIs of records in a space. */
+const SPACE_URI_COLUMNS = [
+  ["board", "space_uri"],
+  ["post", "uri"],
+  ["post", "space_uri"],
+  ["removal", "uri"],
+  ["removal", "space_uri"],
+  ["removal", "subject_uri"],
+  ["note_position", "uri"],
+  ["note_position", "space_uri"],
+  ["note_position", "subject_uri"],
+  ["sync_space", "space_uri"],
+  ["sync_repo", "space_uri"],
+  ["space_blob", "space_uri"],
+] as const;
 
 const APPLICATION_TABLES = [
   "account",
@@ -90,9 +107,37 @@ const migrationProvider: MigrationProvider = {
             .execute();
         },
       },
+      [SPACE_URI_FORM_MIGRATION_NAME]: {
+        // Space hosts now send `at:space/{spaceDid}/{rest}` in place of
+        // `at://{spaceDid}/space/{rest}`. Synced repo state stays valid, so this
+        // only rewrites the stored URIs. Values already in the new form, and
+        // public `at://` URIs, are left as they are.
+        // No down(): an older release can't talk to upgraded space hosts.
+        async up(db) {
+          for (const [table, column] of SPACE_URI_COLUMNS) {
+            await rewriteLegacySpaceUris(db, table, column);
+          }
+        },
+      },
     };
   },
 };
+
+async function rewriteLegacySpaceUris(
+  db: Kysely<unknown>,
+  table: string,
+  column: string,
+): Promise<void> {
+  const ref = sql.raw(column);
+  // In `at://{authority}/space/{rest}`, the authority starts at character 6.
+  const slash = sql`instr(substr(${ref}, 6), '/')`;
+  await sql`UPDATE ${sql.raw(table)}
+    SET ${ref} = 'at:space/' || substr(${ref}, 6, ${slash} - 1) || '/'
+      || substr(${ref}, 6 + ${slash} + length('space/'))
+    WHERE substr(${ref}, 1, 5) = 'at://'
+      AND ${slash} > 1
+      AND substr(${ref}, 6 + ${slash}, length('space/')) = 'space/'`.execute(db);
+}
 
 export async function migrate(): Promise<void> {
   await migrateDatabase(getQueryDb());

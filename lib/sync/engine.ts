@@ -9,6 +9,7 @@ import {
   type SpaceCommit,
   type VerifyMacParams,
 } from "@atproto/space";
+import { AtUri } from "@atproto/syntax";
 import {
   REMOVAL_COLLECTION,
   POSITION_COLLECTION,
@@ -1002,13 +1003,27 @@ function parseSubject(value: unknown): { uri: string; cid?: string } | undefined
   if (!value || typeof value !== "object") return undefined;
   const subject = value as { uri?: unknown; cid?: unknown };
   if (typeof subject.uri !== "string") return undefined;
+  const uri = normalizeAtUri(subject.uri);
   const cid =
     typeof subject.cid === "string"
       ? subject.cid
       : subject.cid && typeof subject.cid === "object"
         ? String(subject.cid)
         : undefined;
-  return { uri: subject.uri, cid };
+  return { uri, cid };
+}
+
+/**
+ * Records written during the spaces alpha may reference notes by their
+ * `at://{spaceDid}/space/...` URI. Index them in the `at:space/` form that
+ * stored notes use. Left as is if it is not a valid AT URI.
+ */
+function normalizeAtUri(uri: string): string {
+  try {
+    return new AtUri(uri).toString();
+  } catch {
+    return uri;
+  }
 }
 
 function tableForCollection(
@@ -1021,7 +1036,7 @@ function tableForCollection(
 }
 
 function authorityFromSpace(space: string): string {
-  const authority = space.match(/^at:\/\/(did:[^/]+)\/space\//)?.[1];
+  const authority = space.match(/^at:space\/(did:[^/]+)\//)?.[1];
   if (!authority) throw new Error("Invalid board reference");
   return authority;
 }

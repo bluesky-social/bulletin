@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const space = request.nextUrl.searchParams.get("space");
   const repoDid = request.nextUrl.searchParams.get("repo");
   const cid = request.nextUrl.searchParams.get("cid");
-  const ownerDid = space?.match(/^at:\/\/(did:[^/]+)\/space\//)?.[1];
+  const ownerDid = space?.match(/^at:space\/(did:[^/]+)\//)?.[1];
   if (
     !space ||
     !ownerDid ||

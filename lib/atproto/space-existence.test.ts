@@ -5,7 +5,7 @@ import type { OAuthSession } from "@atproto/oauth-client-node";
 import { probeSpaceExists } from "./space-existence";
 
 const session = {} as OAuthSession;
-const space = "at://did:plc:owner/space/example/self";
+const space = "at:space/did:plc:owner/example/self";
 
 test("a minted credential proves the space exists", async () => {
   assert.equal(await probeSpaceExists(session, space, async () => ({})), true);
